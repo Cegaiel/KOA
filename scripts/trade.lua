@@ -15,6 +15,8 @@ dropdown_qty_values = {};
 dropdown_who_values = {"Ceg A (Simon)", "Ceg B (Dog)", "Ceg C (Skull)", "Cegaiel", "Manual"};
 tradetotalqty = 0
 
+testMode = false; -- Only send 1 (testModeQty) resource at a time. Idea for testing out macro without sending a bunch of resources. Set to true to enable testMode.
+
 -- returnMarchReSend Notes:
 -- if set to 2 then when your 2nd of 5 or 6 march has returned, it'll start sending more.
 -- 3 will wait until the 3rd march returns before sending more troops
@@ -31,9 +33,29 @@ function doit()
 
   promptOkay("Don\'t Forget !\n\nWhen trading Equip BOTH:\n\nHERO: Sir Dinadan\n\nARMOR: Production (Head/Feet)", nil, 0.7)
 
-  promptNumbers()
-  castleLoc()
-  main()
+  while 1 do
+    totalSent = 0;
+    shutdown = nil;
+    finished = nil;
+    totalNetSent = 0
+    slotsSent = 0
+    tradetotalqty = 0
+
+    promptNumbers()
+
+    if successfulCastLoc then --zz
+      sleepWithStatus(2500,"Preparing to click last known good Castle Position.\n\nDO NOT TOUCH MOUSE!!!", nil, 0.7);
+    else
+      castleLoc()
+    end
+
+    main()
+
+    if finished then
+      finish()
+    end
+
+  end -- while
 end
 
 
@@ -51,7 +73,7 @@ function castleLoc()
 end
 
 
-function tradeLoc()
+function tradeLoc()  -- Not in use currently
 lsSleep(200)
   while not lsShiftHeld() do
     sleepWithStatus(100,"Tap Shift over RIGHT Edge of Slider Box (Near the + button).\n\nMake sure you test by clicking the spot to verify it slides to Max", nil, 0.7);
@@ -157,7 +179,6 @@ delay = 85;
         elseif (dropdown_who_cur_value == 5) then
           dropdownValues(435000, 87000, 21750) -- Food/Wood, Iron, Silver - 50% from Dinadin
           marchslots = 5;
-          --tradepct = 11;
         end
 
 
@@ -218,7 +239,7 @@ delay = 85;
         if not tonumber(tradetotalqty) then
           is_done = nil;
           lsPrint(5, y+18, z+10, 0.7, 0.7, 0xFF2020ff, "MUST BE A NUMBER");
-          tradetotalqty = 1;
+          tradetotalqty = 0;
         else
           writeSetting("tradetotalqty",tonumber(tradetotalqty));
         end
@@ -281,17 +302,18 @@ delay = 85;
 
 -- ETA is using delay (ie 45s), which only counts the 1st cart/march.
 -- It takes about 8-9 seconds to finish sending 2nd - 4th cart/march.
--- extraDelay is only a visual thing for ETA
+-- extraDelay is only a visual thing for ETA "Remaining" time on screen.
 
-        --extraDelay = 9;
-        extraDelay = 0;
+        extraDelay = 9;
 
         eta = convertTime((delay + extraDelay) * loopCount * 1000)
         etaRaw = (delay+extraDelay) * loopCount * 1000
         y = y + 55;
 
-        if lsButtonText(10, lsScreenY - 30, z, 100, 0xFFFFFFff, "Next") then
-          is_done = 1;
+        if tonumber(tradetotalqty) > 0 then
+          if lsButtonText(10, lsScreenY - 30, z, 100, 0xFFFFFFff, "Next") then
+            is_done = 1;
+          end
         end
 
         if (dropdown_who_cur_value == 5) or manualDelay then
@@ -389,20 +411,41 @@ end
 
 function tradeButtonPlus()
         tradePlus = nil;
+        tradeWait = 0;
+        maxTradeWait = 4;
+
         while not tradePlus do
           srReadScreen();
           tradePlus = srFindImage("tradePlus.png", 8000)
           sleepWithStatus(200, "Waiting for Trade Window to Open", nil, 0.7);
-        end
+          tradeWait = tradeWait + 1
+
+          if tradeWait >= maxTradeWait then  -- Wait 1.5s and try to click castle again, using sleepWithStatus 100 above = 15
+            sleepWithStatus(6000, "Looking for Trade + button too long, I quit");
+            break;
+          end
+
+        end --while
         -- Click the end of Slider Bar for Max Resources
+
+
+      -- testMode is when we might want to do some tests on modifying the macro but we just want to send 1 resource at a time so we don't run out too fast
+      -- Simply click the + button one time instead of the slider bar.
+      if testMode then
+	  xSliderOffset = 0;
+      else
+	  xSliderOffset = 40;
+      end
+
+
         if product == "Food" then
-          srClickMouse(tradePlus[0]-40, tradePlus[1]+7)
+          srClickMouse(tradePlus[0]-xSliderOffset, tradePlus[1]+7)
         elseif product == "Wood" then
-          srClickMouse(tradePlus[0]-40, tradePlus[1]+136)
+          srClickMouse(tradePlus[0]-xSliderOffset, tradePlus[1]+136)
         elseif product == "Iron" then
-          srClickMouse(tradePlus[0]-40, tradePlus[1]+261)
+          srClickMouse(tradePlus[0]-xSliderOffset, tradePlus[1]+261)
         elseif product == "Silver" then
-          srClickMouse(tradePlus[0]-40, tradePlus[1]+385)
+          srClickMouse(tradePlus[0]-xSliderOffset, tradePlus[1]+385)
         end
 
         srClickMouse(965, 870) -- Send Button
@@ -421,31 +464,34 @@ function main()
         end 
 
       for i=1, marchslots do
-        tradeButton()
 
         if shutdown then
           break;
         end 
 
-        tradeButtonPlus()
+        if not finished then
+          tradeButton()
+          tradeButtonPlus()
+          sleepWithStatus(100, "Sending March " .. i .. " of " .. marchslots, nil, 0.7)
+          totalSent = totalSent + qty
+          totalNetSent = totalNetSent + actualTransferPerSlot
+          totalRemaining = math.floor(slotsToFulfillQty - totalSent)
+          slotsSent = slotsSent + 1
+	    lsEditBoxSetText("tradetotalqty", tonumber(totalRemaining));
+	    writeSetting("tradetotalqty", tonumber(totalRemaining));
+        end
 
-        sleepWithStatus(100, "Sending March " .. i .. " of " .. marchslots, nil, 0.7)
-        totalSent = totalSent + qty
-        totalNetSent = totalNetSent + actualTransferPerSlot
-        totalRemaining = math.floor(slotsToFulfillQty - totalSent)
-        slotsSent = slotsSent + 1
-	lsEditBoxSetText("tradetotalqty", tonumber(totalRemaining));
-	writeSetting("tradetotalqty", tonumber(totalRemaining));
+        successfulCastLoc = 1; --zz we got passed tradeButton() and tradeButtonPlus(), must be good?
 
 	  if slotsSent == slotsToFulfill then
           finished = 1
-          break;
         end
 
-	if i == returnMarchReSend then -- Start Time on this march, instead of last march, below --zz
-      	  marchTimer = lsGetTimer()
-	end
-      end -- for i
+	  if i == returnMarchReSend then -- Start Time on this march, instead of last march, below
+      	    marchTimer = lsGetTimer()
+	  end
+
+      end -- for i 
 
       --Note this now starts timer after sending last cart/march, NOT FIRST, so that misclicks (repeat Trade Button) won't break the timers
      -- marchTimer = lsGetTimer()
@@ -461,36 +507,45 @@ function main()
 	    break;
 	  else
 
-	    waitingMessage = "Waiting " .. marchTimerRemaining .. " (" .. marchTimerRemainingReverse .. ") of " .. math.floor(delay) .. "s for  this March"
+	    waitingMessage = "Waiting " .. marchTimerRemaining .. " (" .. marchTimerRemainingReverse .. ") of " .. math.floor(delay) .. "s for this March"
 	    --waitingMessage = "Waiting " .. marchTimerRemaining .. " of " .. math.floor(delay) .. "s for this March"
 	    finishedMessage = "FINISHED"
 
-	    mainMessage = "Sent " .. slotsSent .. " of " .. slotsToFulfill .. " March Slots\nPasses: " .. j .. " of " .. loopCount .. "  < " .. loopCount - j .. " Remaining >\n\nTotal Gross Sent: " .. addComma(math.floor(totalSent)) .. " of " .. addComma(slotsToFulfillQty) .. "\nTotal Net Sent:    " .. addComma(math.floor(totalNetSent)) .. " of " .. addComma(math.floor(slotsToFulfillQty - qtyAfterFee)) ..  "\n\nN/G Per March: " .. addComma(actualTransferPerMarch) .. " / " .. addComma(math.floor(qty*marchslots)) .. "\nN/G Remaining: " .. addComma(math.floor((slotsToFulfillQty - qtyAfterFee) - totalNetSent)) .. " / " .. addComma(totalRemaining) .. "\n\n" .. eta .."  |  ETA   ( " .. product .. " )\n" .. getElapsedTime(beginTime) .. "  |  Elapsed\n" .. convertTime(etaRaw - (lsGetTimer()-beginTime)) .. "  |  Remaining\n\n" .. convertTime(marchTimerRemainingReverseRaw*1000) ..  "  | Remaining (This March)\n\nResources Transfered:"
+	    mainMessage = "Sent " .. slotsSent .. " of " .. slotsToFulfill .. " March Slots\nPasses: " .. j .. " of " .. loopCount .. "  < " .. loopCount - j .. " Remaining >\n\nTotal Gross Sent: " .. addComma(math.floor(totalSent)) .. " of " .. addComma(slotsToFulfillQty) .. "\nTotal Net Sent:    " .. addComma(math.floor(totalNetSent)) .. " of " .. addComma(math.floor(slotsToFulfillQty - qtyAfterFee)) ..  "\n\nN/G Per March: " .. addComma(actualTransferPerMarch) .. " / " .. addComma(math.floor(qty*marchslots)) .. "\nN/G Remaining: " .. addComma(math.floor((slotsToFulfillQty - qtyAfterFee) - totalNetSent)) .. " / " .. addComma(totalRemaining) .. "\n\n" .. eta .."  |  ETA   ( " .. product .. " )\n" .. getElapsedTime(beginTime) .. "  |  Elapsed\n" .. convertTime(etaRaw - (lsGetTimer()-beginTime)) .. "  |  Remaining\n\n" .. convertTime(marchTimerRemainingReverseRaw*1000) ..  "  | Remaining (This March)"
 
 
 	    sleepWithStatus(200, mainMessage, nil, 0.7, waitingMessage)
-	    stfu()
-	  end -- if tonumber(marchTimeRemaining ..
+--	    stfu()
+	  end -- if tonumber(marchTimeRemaining)
 
 	end  -- while
 
-
-
-      if finished then
-      --    break;
-        while 1 do
-          sleepWithStatus(3500, mainMessage, nil, 0.7, finishedMessage)
-          lsPlaySound("successful.wav");
-        end
-      end
-
     end --for j
+
     if shutdown then -- We didn't get a Trade button on first try, so abort, start Over
       shutdown = nil;
       lsPlaySound("fail.wav")
       castleLoc()
       main()
     end
+
+end
+
+
+function finish()
+  soundCounter = 0;
+  while 1 do
+    statusScreen(mainMessage, nil, 0.7);
+    if lsButtonText(10, lsScreenY - 30, 0, 120, 0xFFFFFFFF, "Main Menu") then
+      break;
+    end
+    if soundCounter == 0 then
+      lsPlaySound("successful.wav");
+    end
+    soundCounter = soundCounter + 1;
+      if soundCounter == 35 then soundCounter = 0 end
+    lsSleep(100);
+  end -- while
 end
 
 
@@ -614,5 +669,9 @@ function dropdownValues(fw, i, s)
         elseif (dropdown_qty_cur_value == 4) then
           qty = dropdown_qty[3]
           product = "Silver"
+        end
+
+        if testMode then
+          qty = 1;
         end
 end
