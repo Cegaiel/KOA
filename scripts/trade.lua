@@ -43,7 +43,7 @@ function doit()
 
     promptNumbers()
 
-    if successfulCastLoc then --zz
+    if successfulCastLoc then
       sleepWithStatus(2500,"Preparing to click last known good Castle Position.\n\nDO NOT TOUCH MOUSE!!!", nil, 0.7);
     else
       castleLoc()
@@ -153,8 +153,8 @@ delay = 49;
 
 --Ceg C
 -- :47 seconds appears on Button to Trade
--- :38 actual seconds appears on timer bar when march is returning
--- :85 TOTAL - Set Delay, below to this value
+-- :4 actual seconds appears on timer bar when march is returning
+-- :83 TOTAL - Set Delay, below to this value
 
 
         elseif (dropdown_who_cur_value == 3) then
@@ -163,7 +163,7 @@ delay = 49;
           tradepct = 10.5; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
 
 -- Delay is seconds on button to march to the castle PLUS the seconds when march is returning
-delay = 85;
+delay = 83;
 
 
 -- CEGAIEL
@@ -391,7 +391,6 @@ end
         tradeWait = 0
 
         if not firstTrade then
-          --error("Trade button did not appear, try moving screen")
           shutdown = 1
           break;
         end
@@ -421,7 +420,6 @@ function tradeButtonPlus()
           tradeWait = tradeWait + 1
 
           if tradeWait >= maxTradeWait then  -- Wait 1.5s and try to click castle again, using sleepWithStatus 100 above = 15
-            sleepWithStatus(6000, "Looking for Trade + button too long, I quit");
             break;
           end
 
@@ -598,11 +596,22 @@ function sleepWithStatus(delay_time, message, color, scale, waitMessage)
     lsSleep(tick_delay);
     waitFrame = waitFrame + 1;
 
-if totalSent > 0 then
-  progressBar(310)
-end
+    if totalSent > 0 then
+      progressBar(310)
+    end
 
+    if totalSent > 0 then
 
+      if lsButtonText(10, lsScreenY - 30, 0, 120, 0xFFFFFFFF, "Main Menu") then
+        totalSent = 0;
+        shutdown = nil;
+        finished = nil;
+        totalNetSent = 0
+        slotsSent = 0
+        tradetotalqty = 0
+        promptNumbers();
+      end
+    end
   end
 end
 
