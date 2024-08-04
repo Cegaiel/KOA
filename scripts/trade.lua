@@ -129,9 +129,9 @@ function promptNumbers()
 -- :53 TOTAL - Set Delay, below to this value
 
         if (dropdown_who_cur_value == 1) then
-          dropdownValues(390000, 78000, 19500) -- Food/Wood, Iron, Silver - 50% from Dinadin
+          dropdownValues(450000, 90000, 22500) -- Food/Wood, Iron, Silver - 50% from Dinadin
           marchslots = 5;
-          tradepct = 10.5; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
+          tradepct = 6.5; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
 
 -- Delay is seconds on button to march to the castle PLUS the seconds when march is returning
 delay = 53;
@@ -143,9 +143,9 @@ delay = 53;
 -- :49 TOTAL - Set Delay, below to this value
 
         elseif (dropdown_who_cur_value == 2) then
-          dropdownValues(390000, 78000, 19500) -- Food/Wood, Iron, Silver - 50% from Dinadin
+          dropdownValues(450000, 90000, 22500) -- Food/Wood, Iron, Silver - 50% from Dinadin
           marchslots = 5;
-          tradepct = 10.5; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
+          tradepct = 6.5; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
 
 -- Delay is seconds on button to march to the castle PLUS the seconds when march is returning
 delay = 49;
@@ -158,9 +158,9 @@ delay = 49;
 
 
         elseif (dropdown_who_cur_value == 3) then
-          dropdownValues(390000, 78000, 19500) -- Food/Wood, Iron, Silver - 50% from Dinadin
+          dropdownValues(450000, 90000, 22500) -- Food/Wood, Iron, Silver - 50% from Dinadin
           marchslots = 5;
-          tradepct = 10.5; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
+          tradepct = 6.5; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
 
 -- Delay is seconds on button to march to the castle PLUS the seconds when march is returning
 delay = 83;
@@ -377,11 +377,6 @@ function tradeButton()
       trade = srFindImage("trade2.png", 12000) -- Try another image if we got Peace Shield activated.
     end
 
-if trade then
---sleepWithStatus(5000, "Found trade image");
-
-end
-
     tradeWait = tradeWait + 1
     sleepWithStatus(200, "Waiting for Trade Button to Appear", nil, 0.7, "Waiting " .. tradeWait .. "/" .. maxTradeWait .. " ticks to ReClick Castle");
       if tradeWait >= maxTradeWait then  -- Wait 1.5s and try to click castle again, using sleepWithStatus 100 above = 15
@@ -392,7 +387,6 @@ end
 
         if not firstTrade then
           shutdown = 1
-          break;
         end
 
       end
@@ -469,6 +463,11 @@ function main()
 
         if not finished then
           tradeButton()
+
+          if shutdown then
+            break; -- If we didn't find a trade button then abort and go back to main menu
+          end 
+
           tradeButtonPlus()
           sleepWithStatus(100, "Sending March " .. i .. " of " .. marchslots, nil, 0.7)
           totalSent = totalSent + qty
@@ -522,7 +521,7 @@ function main()
 
     if shutdown then -- We didn't get a Trade button on first try, so abort, start Over
       shutdown = nil;
-      lsPlaySound("fail.wav")
+      lsPlaySound("error.wav")
       castleLoc()
       main()
     end
