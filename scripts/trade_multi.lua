@@ -122,36 +122,38 @@ end
 
 
 function askResources()
-  scale = 0.8;
+  local scale = 0.8;
   local z = 0;
   local y = 0;
   local is_done = nil;
+  local defaultColor = 0xffffffFF;
+  local highlightColor = 0xfff76bFF;
 
   while not is_done do
     checkBreak("disallow pause");
 
     if doFood then
-      doFoodColor = 0xfff76bFF;
+      doFoodColor = highlightColor;
     else
-      doFoodColor = 0xffffffFF;
+      doFoodColor = defaultColor;
     end
 
     if doWood then
-      doWoodColor = 0xfff76bFF;
+      doWoodColor = highlightColor;
     else
-      doWoodColor = 0xffffffFF;
+      doWoodColor = defaultColor;
     end
 
     if doIron then
-      doIronColor = 0xfff76bFF;
+      doIronColor = highlightColor;
     else
-      doIronColor = 0xffffffFF;
+      doIronColor = defaultColor;
     end
 
     if doSilver then
-      doSilverColor = 0xfff76bFF;
+      doSilverColor = highlightColor;
     else
-      doSilverColor = 0xffffffFF;
+      doSilverColor = defaultColor;
     end
 
     y = 10;
