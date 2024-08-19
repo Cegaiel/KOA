@@ -213,8 +213,20 @@ function askResources()
 
     end
 
-    y = y + 100;
-    lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Which Resources?");
+    y = y + 40;
+
+    if sendEvenMarch then
+      sendEvenMarchColor = 0xb1dd8cff;
+    else
+      sendEvenMarchColor = 0xFFFFFFff;
+    end
+
+    sendEvenMarch = readSetting("sendEvenMarch",sendEvenMarch);
+    sendEvenMarch = CheckBox(10, y, 10, sendEvenMarchColor, "  Send Marches dividable by max slots: " .. marchslots, sendEvenMarch, 0.7, 0.7);
+    writeSetting("sendEvenMarch",sendEvenMarch);
+
+    y = y + 40;
+    lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Trade which resources?");
     y = y + 30;
 
     doFood = readSetting("doFood",doFood);
@@ -291,8 +303,7 @@ function promptNumbers(resource)
   while not is_done do
     checkBreak("disallow pause");
     local y = 10;
-
-    lsPrint(5, y, z, scale, scale, 0xFFFFFFff, "Setup " .. resourceName .. " Trade for: " .. dropdown_who_values[dropdown_who_cur_value]);
+    lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Setup " .. resourceName .. " Trade for: " .. dropdown_who_values[dropdown_who_cur_value]);
     y = y + 30
     lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Trade Total Qty: ");
 
@@ -377,6 +388,14 @@ function promptNumbers(resource)
 
     slotsToFulfill = math.floor(tradetotalqty / qty)
     slotsToFulfillQty = math.floor(slotsToFulfill * qty)
+
+    if sendEvenMarch then
+      local recalculate = math.floor(slotsToFulfillQty / (marchslots * qty));
+      tradetotalqty = (recalculate * marchslots) * qty;
+      slotsToFulfill = math.floor(tradetotalqty / qty)
+      slotsToFulfillQty = math.floor(slotsToFulfill * qty)
+    end
+
     tradeMult = tradepct * .01
     qtyAfterFee = math.floor(slotsToFulfillQty * tradeMult)
     transferPerSlot = math.floor(qty * tradeMult)
@@ -395,18 +414,13 @@ function promptNumbers(resource)
       end
     end
 
-    if (dropdown_who_cur_value == 5) or manualDelay then
-      y = y + 30
-      lsPrintWrapped(10, y-30, z, lsScreenX - 20, scale, scale, 0xD0D0D0ff, "Ceg -> A: 56? |  Ceg -> B: 53 |  Ceg -> C: 63\n------------------------------------------");
-    end
-
     if slotsToFulfill > 0 then
 
-      lsPrintWrapped(10, y, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff, "Trade Total Qty: " .. addComma(slotsToFulfillQty) .. "\nLoss from Fee:   -" .. addComma(qtyAfterFee) .. "\n------------------------------------------\nPlayer Receives: " .. addComma(math.floor(slotsToFulfillQty - qtyAfterFee)) .. "\n\nTrade Fee: " .. tradepct .. "% : " .. addComma(transferPerSlot) .. "  < x" .. marchslots .. ": " .. addComma(transferPerMarch) .. " >\n\nGross Transfer: " .. addComma(qty) .. "  < x" .. marchslots .. ": " .. addComma(math.floor(qty*marchslots)) ..        " >\n\nNet Transfer: " .. addComma(actualTransferPerSlot) .. "  < x" .. marchslots .. ": " .. addComma(actualTransferPerMarch) .. " >\n\nMarches to Complete x" .. marchslots .. ": " .. loopCount .. "  < " .. round((slotsToFulfillQty / qty) / marchslots,2) .. " >\n\nMarch Slots to Complete: " .. slotsToFulfill .. "  < " .. addComma(slotsToFulfillQty) ..      " >\n\nETA:  " .. eta);
+      lsPrintWrapped(10, y, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff, "Actual Trade Qty:  " .. addComma(slotsToFulfillQty) .. "\nLoss from Fee:   -" .. addComma(qtyAfterFee) .. "\n------------------------------------------\nPlayer Receives:  " .. addComma(math.floor(slotsToFulfillQty - qtyAfterFee)) .. "\n\nTrade Fee:  " .. tradepct .. "% :  " .. addComma(transferPerSlot) .. "  < x" .. marchslots .. ":  " .. addComma(transferPerMarch) .. " >\n\nGross Transfer:  " .. addComma(qty) .. "  < x" .. marchslots .. ":  " .. addComma(math.floor(qty*marchslots)) ..        " >\n\nNet Transfer:  " .. addComma(actualTransferPerSlot) .. "  < x" .. marchslots .. ":  " .. addComma(actualTransferPerMarch) .. " >\n\nMarches to Complete x" .. marchslots .. ":  " .. loopCount .. "  < " .. round((slotsToFulfillQty / qty) / marchslots,2) .. " >\n\nMarch Slots to Complete:  " .. slotsToFulfill .. "  < " .. addComma(slotsToFulfillQty) ..      " >\n\nETA:  " .. eta);
 
     else
 
-      lsPrintWrapped(10, y, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff, "Trade Total Qty: " .. addComma(tradetotalqty) .. "\nLoss from Fee:   -" .. addComma(math.floor(tradetotalqty*tradeMult)) .. "\n\nPlayer Receives: " .. addComma(math.floor(tradetotalqty - (tradetotalqty*tradeMult)    )) .. "\n\nTrade Fee: " .. tradepct .. "% : " .. addComma(transferPerSlot) .. "  < x" .. marchslots .. ": " .. addComma(transferPerMarch) .. " >\n\nGross Transfer: " .. addComma(qty) .. "  < x" .. marchslots .. ": " .. addComma(math.floor(qty*marchslots)) ..        " >\n\nNet Transfer: " .. addComma(actualTransferPerSlot) .. "  < x" .. marchslots .. ": " .. addComma(actualTransferPerMarch) .. " >\n\nMarches to Complete x" .. marchslots .. ": " .. loopCount .. "  < " .. round((slotsToFulfillQty / qty) / marchslots,2) .. " >\n\nMarch Slots to Complete: " .. slotsToFulfill .. "  < " .. addComma(slotsToFulfillQty) ..      " >\n\nETA:  " .. eta);
+      lsPrintWrapped(10, y, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff, "Trade Total Qty:  " .. addComma(tradetotalqty) .. "\nLoss from Fee:   -" .. addComma(math.floor(tradetotalqty*tradeMult)) .. "\n\nPlayer Receives:  " .. addComma(math.floor(tradetotalqty - (tradetotalqty*tradeMult)    )) .. "\n\nTrade Fee:  " .. tradepct .. "% :  " .. addComma(transferPerSlot) .. "  < x" .. marchslots .. ":  " .. addComma(transferPerMarch) .. " >\n\nGross Transfer:  " .. addComma(qty) .. "  < x" .. marchslots .. ":  " .. addComma(math.floor(qty*marchslots)) ..        " >\n\nNet Transfer:  " .. addComma(actualTransferPerSlot) .. "  < x" .. marchslots .. ":  " .. addComma(actualTransferPerMarch) .. " >\n\nMarches to Complete x" .. marchslots .. ":  " .. loopCount .. "  < " .. round((slotsToFulfillQty / qty) / marchslots,2) .. " >\n\nMarch Slots to Complete:  " .. slotsToFulfill .. "  < " .. addComma(slotsToFulfillQty) ..      " >\n\nETA:  " .. eta);
 
     end
 
