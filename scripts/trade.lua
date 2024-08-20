@@ -24,14 +24,14 @@ testMode = false; -- Only send 1 (testModeQty) resource at a time. Idea for test
 
 -- Use 4 to be really safe, 3 is faster, 2 is really fast but be careful -> it might potentially fail to send last march if all marches haven't returned yet)
 
--- My best advice is if game is running full speed use 4 or 3. If game is slightly lagging, then 2 should be ok.
+-- 4 is very safe. If game is running lag-free then you can try 2 or 3.
+-- It's better to be safe than sorry. If in doubt choose 4 to be really safe or 5 for maximum safety. However you save about 1 second for every number above 5.
 
 returnMarchReSend = 4; -- which march (that's returned) to start resending resources again
 
 function doit()
-  askForWindow("Trade Resources to Player");
-
-  promptOkay("Don\'t Forget !\n\nWhen trading Equip BOTH:\n\nHERO: Sir Dinadan\n\nARMOR: Production (Head/Feet)", nil, 0.7)
+  askForWindow("Trade Resources to Player by clicking a neighboring castle");
+  promptOkay("Don\'t Forget !\n\nWhen trading Equip BOTH:\n\nHERO: Sir Dinadan\n\nARMOR: Production (Helm + Greaves)", nil, 0.7, nil, 1, nil)
 
   while 1 do
     totalSent = 0;
@@ -283,7 +283,6 @@ delay = 83;
           end
         end
 
-
         slotsToFulfill = math.floor(tradetotalqty / qty)
         slotsToFulfillQty = math.floor(slotsToFulfill * qty)
 
@@ -298,11 +297,12 @@ delay = 83;
         loopCount = math.ceil((slotsToFulfillQty / qty) / marchslots)
 
 
-
-
--- ETA is using delay (ie 45s), which only counts the 1st cart/march.
--- It takes about 8-9 seconds to finish sending 2nd - 4th cart/march.
--- extraDelay is only a visual thing for ETA "Remaining" time on screen.
+-- ETA is uses delay value that you set for each of your characters in askResources() function.
+-- If set delay 53 (seconds) then ETA is calculated using that number and multiplying by number of marches it will take to finish trading.
+-- However, we need to also consider the amount of time it takes to click/send for EACH of your marches.
+-- 1-2 seconds for each march is a good number to consider for extraDelay.
+-- extraDelay is ONLY a visual thing for ETA "Remaining" time on screen. It does not affect trade behavior. It's simply to try to give you an idea of ETA remaining.
+-- You should multiply your max march slots times 1 or 2 seconds. Somewhere between 5-10 is a good number to use. Zero will just show raw delay time and not consider clicking times.
 
         extraDelay = 9;
 

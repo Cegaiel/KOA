@@ -29,10 +29,13 @@ returnMarchReSend = 3; -- which march # (that's returned) before we start resend
 -- However, we need to also consider the amount of time it takes to click/send for EACH of your marches.
 -- 1-2 seconds for each march is a good number to consider for extraDelay.
 -- extraDelay is ONLY a visual thing for ETA "Remaining" time on screen. It does not affect trade behavior. It's simply to try to give you an idea of ETA remaining.
--- You should multiply your max march slots times 1 or 2 seconds. Somewhere between 5-10 is a good number to use. Zero will just show raw delay time and not consider clicking times.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-extraDelay = 10;
+-- Additional seconds for ETA calculation
+ extraDelay = returnMarchReSend;
+
+-- Optionally uncomment below to override default value
+-- extraDelay = 3;
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -43,7 +46,7 @@ dropdown_who_values = {"Ceg A", "Ceg B", "Ceg C"};
 
 
 function doit()
-  askForWindow("Trade Resources to Player by clicking a neighboring castle");
+  askForWindow("Trade Resources to Player from Trading Post\n\nOpen Trading Post, Resource Help, Members tab.");
   promptOkay("Don\'t Forget !\n\nWhen trading Equip BOTH:\n\nHERO: Sir Dinadan\n\nARMOR: Production (Helm + Greaves)", nil, 0.7, nil, 1, nil)
 
   while 1 do
@@ -66,28 +69,28 @@ function doit()
     end
 
     if successfulCastLoc then
-      sleepWithStatus(2500,"Preparing to click last known good Castle Position.\n\nDO NOT TOUCH MOUSE!!!", nil, 0.7);
+      sleepWithStatus(1500,"Ready to click last known Send button location.\n\nDO NOT TOUCH MOUSE!!!", nil, 0.7);
     else
       castleLoc()
     end
 
     if doFood then
-      sleepWithStatus(2000,"Starting FOOD Transfer!")
+      sleepWithStatus(1000,"Starting FOOD Transfer!\n\nDon't Touch Mouse for a moment!", nil, 0.7)
       main(1)
     end
 
     if doWood then
-      sleepWithStatus(2000,"Starting WOOD Transfer!")
+      sleepWithStatus(1000,"Starting WOOD Transfer!\n\nDon't Touch Mouse for a moment!", nil, 0.7)
       main(2)
     end
 
     if doIron then
-      sleepWithStatus(2000,"Starting IRON Transfer!")
+      sleepWithStatus(1000,"Starting IRON Transfer!\n\nDon't Touch Mouse for a moment!", nil, 0.7)
       main(3)
     end
 
     if doSilver then
-      sleepWithStatus(2000,"Starting SILVER Transfer!")
+      sleepWithStatus(1000,"Starting SILVER Transfer!\n\nDon't Touch Mouse for a moment!", nil, 0.7)
       main(4)
     end
 
@@ -101,7 +104,7 @@ end
 
 function castleLoc()
   while not lsShiftHeld() do
-    sleepWithStatus(100,"Tap Shift over Castle Location.\n\nPick a location that won\'t be affected by the magnfiying glass when troops are nearby.", nil, 0.7);
+    sleepWithStatus(100,"Click your Trade Post, Resource Help button, Members Tab and find the Player you want to trade\n\nTap Shift over Send Button !", nil, 0.7);
   end
 
   while lsShiftHeld() do
@@ -109,7 +112,6 @@ function castleLoc()
   end
 
   castlePos = getMousePos()
-  srClickMouse(castlePos[0], castlePos[1]) -- Click castle to Open Trade menu for tradeLoc (next)
 end
 
 
@@ -202,6 +204,10 @@ function askResources()
 
 
 --Ceg C
+
+
+
+
 -- :47 seconds appears on Button to Trade
 -- :4 actual seconds appears on timer bar when march is returning
 -- :83 TOTAL - Set Delay, below to this value
@@ -219,17 +225,6 @@ function askResources()
 
     y = y + 40;
 
-    if sendEvenMarch then
-      sendEvenMarchColor = 0xb1dd8cff;
-    else
-      sendEvenMarchColor = 0xFFFFFFff;
-    end
-
-    sendEvenMarch = readSetting("sendEvenMarch",sendEvenMarch);
-    sendEvenMarch = CheckBox(10, y, 10, sendEvenMarchColor, "  Send Marches dividable by max slots: " .. marchslots, sendEvenMarch, 0.7, 0.7);
-    writeSetting("sendEvenMarch",sendEvenMarch);
-
-    y = y + 40;
     lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Trade which resources?");
     y = y + 30;
 
@@ -302,14 +297,17 @@ function promptNumbers(resource)
   local scale = 0.7;
   local z = 0;
   local is_done = nil;
-  local value = nil;
 
   while not is_done do
     checkBreak("disallow pause");
+    local sendMaxMarchSlotsColor = 0xFFFFFFff;
     local y = 10;
-    lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Setup " .. resourceName .. " Trade for: " .. dropdown_who_values[dropdown_who_cur_value]);
+    lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Setup " .. resourceName .. " Trade for:  " .. dropdown_who_values[dropdown_who_cur_value]);
     y = y + 30
-    lsPrint(10, y, z, scale, scale, 0xFFFFFFff, "Trade Total Qty: ");
+
+    lsPrint(10, y+35, z, scale, scale, 0xFFFFFFff, "Trade Total Qty: ");
+
+    y = y + 35
 
     if resource == 1 then
       lsPrint(140, y+25, z, scale, scale, 0xFFFFFFff, addComma(tradetotalqty_food));
@@ -320,7 +318,7 @@ function promptNumbers(resource)
 
       if not tonumber(tradetotalqty_food) then
         is_done = nil;
-        lsPrint(5, y+18, z+10, 0.7, 0.7, 0xFF2020ff, "MUST BE A NUMBER");
+        lsPrint(15, y+25, z+10, 0.7, 0.7, 0xFF2020ff, "NOT NUMERIC !");
         tradetotalqty_food = 0;
       else
         writeSetting("tradetotalqty_food",tonumber(tradetotalqty_food));
@@ -329,6 +327,11 @@ function promptNumbers(resource)
       tradetotalqty = tradetotalqty_food;
       qty = dropdown_qty[1];
       resourceName = "FOOD"
+      sendMaxMarchSlots_food = readSetting("sendMaxMarchSlots_food",sendMaxMarchSlots_food);
+      if sendMaxMarchSlots_food then sendMaxMarchSlotsColor = 0xffaa00ff; end
+      sendMaxMarchSlots_food = CheckBox(10, y-35, 10, sendMaxMarchSlotsColor, "  Send Marches dividable by max slots: " .. marchslots, sendMaxMarchSlots_food, 0.7, 0.7);
+      writeSetting("sendMaxMarchSlots_food",sendMaxMarchSlots_food);
+
 
     elseif resource == 2 then
       lsPrint(140, y+25, z, scale, scale, 0xFFFFFFff, addComma(tradetotalqty_wood));
@@ -339,7 +342,7 @@ function promptNumbers(resource)
 
       if not tonumber(tradetotalqty_wood) then
         is_done = nil;
-        lsPrint(5, y+18, z+10, 0.7, 0.7, 0xFF2020ff, "MUST BE A NUMBER");
+        lsPrint(15, y+25, z+10, 0.7, 0.7, 0xFF2020ff, "NOT NUMERIC !");
         tradetotalqty_wood = 0;
       else
         writeSetting("tradetotalqty_wood",tonumber(tradetotalqty_wood));
@@ -348,6 +351,11 @@ function promptNumbers(resource)
       tradetotalqty = tradetotalqty_wood;
       qty = dropdown_qty[1];
       resourceName = "WOOD"
+      sendMaxMarchSlots_wood = readSetting("sendMaxMarchSlots_wood",sendMaxMarchSlots_wood);
+      if sendMaxMarchSlots_wood then sendMaxMarchSlotsColor = 0xffaa00ff; end
+      sendMaxMarchSlots_wood = CheckBox(10, y-35, 10, sendMaxMarchSlotsColor, "  Send Marches dividable by max slots: " .. marchslots, sendMaxMarchSlots_wood, 0.7, 0.7);
+      writeSetting("sendMaxMarchSlots_wood",sendMaxMarchSlots_wood);
+
 
     elseif resource == 3 then
       lsPrint(140, y+25, z, scale, scale, 0xFFFFFFff, addComma(tradetotalqty_iron));
@@ -358,7 +366,7 @@ function promptNumbers(resource)
 
       if not tonumber(tradetotalqty_iron) then
         is_done = nil;
-        lsPrint(5, y+18, z+10, 0.7, 0.7, 0xFF2020ff, "MUST BE A NUMBER");
+        lsPrint(15, y+25, z+10, 0.7, 0.7, 0xFF2020ff, "NOT NUMERIC !");
         tradetotalqty_iron = 0;
       else
         writeSetting("tradetotalqty_iron",tonumber(tradetotalqty_iron));
@@ -367,6 +375,11 @@ function promptNumbers(resource)
       tradetotalqty = tradetotalqty_iron;
       qty = dropdown_qty[2];
       resourceName = "IRON"
+      sendMaxMarchSlots_iron = readSetting("sendMaxMarchSlots_iron",sendMaxMarchSlots_iron);
+      if sendMaxMarchSlots_iron then sendMaxMarchSlotsColor = 0xffaa00ff; end
+      sendMaxMarchSlots_iron = CheckBox(10, y-35, 10, sendMaxMarchSlotsColor, "  Send Marches dividable by max slots: " .. marchslots, sendMaxMarchSlots_iron, 0.7, 0.7);
+      writeSetting("sendMaxMarchSlots_iron",sendMaxMarchSlots_iron);
+
 
     elseif resource == 4 then
       lsPrint(140, y+25, z, scale, scale, 0xFFFFFFff, addComma(tradetotalqty_silver));
@@ -377,7 +390,7 @@ function promptNumbers(resource)
 
       if not tonumber(tradetotalqty_silver) then
         is_done = nil;
-        lsPrint(5, y+18, z+10, 0.7, 0.7, 0xFF2020ff, "MUST BE A NUMBER");
+        lsPrint(15, y+25, z+10, 0.7, 0.7, 0xFF2020ff, "NOT NUMERIC !");
         tradetotalqty_silver = 0;
       else
         writeSetting("tradetotalqty_silver",tonumber(tradetotalqty_silver));
@@ -386,14 +399,17 @@ function promptNumbers(resource)
       tradetotalqty = tradetotalqty_silver;
       qty = dropdown_qty[3];
       resourceName = "SILVER"
+      sendMaxMarchSlots_silver = readSetting("sendMaxMarchSlots_silver",sendMaxMarchSlots_silver);
+      if sendMaxMarchSlots_silver then sendMaxMarchSlotsColor = 0xffaa00ff; end
+      sendMaxMarchSlots_silver = CheckBox(10, y-35, 10, sendMaxMarchSlotsColor, "  Send Marches dividable by max slots: " .. marchslots, sendMaxMarchSlots_silver, 0.7, 0.7);
+      writeSetting("sendMaxMarchSlots_silver",sendMaxMarchSlots_silver);
 
     end
-
 
     slotsToFulfill = math.floor(tradetotalqty / qty)
     slotsToFulfillQty = math.floor(slotsToFulfill * qty)
 
-    if sendEvenMarch then
+    if (resource == 1 and sendMaxMarchSlots_food) or (resource == 2 and sendMaxMarchSlots_wood) or (resource == 3 and sendMaxMarchSlots_iron) or (resource == 4 and sendMaxMarchSlots_silver) then
       local recalculate = math.floor(slotsToFulfillQty / (marchslots * qty));
       tradetotalqty = (recalculate * marchslots) * qty;
       slotsToFulfill = math.floor(tradetotalqty / qty)
@@ -412,19 +428,28 @@ function promptNumbers(resource)
 
     y = y + 55;
 
-    if (resource == 1 and tonumber(tradetotalqty_food) > 0) or (resource == 2 and tonumber(tradetotalqty_wood) > 0) or (resource == 3 and tonumber(tradetotalqty_iron) > 0) or (resource == 4 and tonumber(tradetotalqty_silver) > 0) then
+    if ( (resource == 1 and tonumber(tradetotalqty_food) > 0) or (resource == 2 and tonumber(tradetotalqty_wood) > 0) or (resource == 3 and tonumber(tradetotalqty_iron) > 0) or (resource == 4 and tonumber(tradetotalqty_silver) > 0) ) and loopCount > 0 then
       if lsButtonText(10, lsScreenY - 30, z, 100, 0xFFFFFFff, "Next") then
         is_done = 1;
       end
+
+    else
+
+      if (resource == 1 and sendMaxMarchSlots_food) or (resource == 2 and sendMaxMarchSlots_wood) or (resource == 3 and sendMaxMarchSlots_iron) or (resource == 4 and sendMaxMarchSlots_silver) then
+        lsPrintWrapped(10, lsScreenY - 90, z, lsScreenX - 20, 0.7, 0.7, 0xffaa00ff, "Trade Total min (" .. addComma(qty*marchslots) .. ") not met.\nUncheck 'Send Marches dividable by max slots' checkbox for decreased (" .. addComma(qty) .. ") min.");
+      else
+        lsPrint(10, lsScreenY - 60, z, scale, scale, 0xFF2020ff, "Trade Total min not met (" .. addComma(qty) .. ")");
+      end
+
     end
 
     if slotsToFulfill > 0 then
 
-      lsPrintWrapped(10, y, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff, "Actual Trade Qty:  " .. addComma(slotsToFulfillQty) .. "\nLoss from Fee:   -" .. addComma(qtyAfterFee) .. "\n------------------------------------------\nPlayer Receives:  " .. addComma(math.floor(slotsToFulfillQty - qtyAfterFee)) .. "\n\nTrade Fee:  " .. tradepct .. "% :  " .. addComma(transferPerSlot) .. "  < x" .. marchslots .. ":  " .. addComma(transferPerMarch) .. " >\n\nGross Transfer:  " .. addComma(qty) .. "  < x" .. marchslots .. ":  " .. addComma(math.floor(qty*marchslots)) ..        " >\n\nNet Transfer:  " .. addComma(actualTransferPerSlot) .. "  < x" .. marchslots .. ":  " .. addComma(actualTransferPerMarch) .. " >\n\nMarches to Complete x" .. marchslots .. ":  " .. loopCount .. "  < " .. round((slotsToFulfillQty / qty) / marchslots,2) .. " >\n\nMarch Slots to Complete:  " .. slotsToFulfill .. "  < " .. addComma(slotsToFulfillQty) ..      " >\n\nETA:  " .. eta);
+      lsPrintWrapped(10, y, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff, "Actual Trade Qty:  " .. addComma(slotsToFulfillQty) .. "\n     Loss from Fee:   -" .. addComma(qtyAfterFee) .. "\n------------------------------------------\nPlayer Receives:  " .. addComma(math.floor(slotsToFulfillQty - qtyAfterFee)) .. "\n\nTrade Fee:  " .. tradepct .. "% :  " .. addComma(transferPerSlot) .. "  < x" .. marchslots .. ":  " .. addComma(transferPerMarch) .. " >\n\nGross Transfer:  " .. addComma(qty) .. "  < x" .. marchslots .. ":  " .. addComma(math.floor(qty*marchslots)) ..        " >\n\nNet Transfer:  " .. addComma(actualTransferPerSlot) .. "  < x" .. marchslots .. ":  " .. addComma(actualTransferPerMarch) .. " >\n\nMarches to Complete x" .. marchslots .. ":  " .. loopCount .. "  < " .. round((slotsToFulfillQty / qty) / marchslots,2) .. " >\n\nMarch Slots to Complete:  " .. slotsToFulfill .. "  < " .. addComma(slotsToFulfillQty) ..      " >\n\nETA:  " .. eta);
 
     else
 
-      lsPrintWrapped(10, y, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff, "Trade Total Qty:  " .. addComma(tradetotalqty) .. "\nLoss from Fee:   -" .. addComma(math.floor(tradetotalqty*tradeMult)) .. "\n\nPlayer Receives:  " .. addComma(math.floor(tradetotalqty - (tradetotalqty*tradeMult)    )) .. "\n\nTrade Fee:  " .. tradepct .. "% :  " .. addComma(transferPerSlot) .. "  < x" .. marchslots .. ":  " .. addComma(transferPerMarch) .. " >\n\nGross Transfer:  " .. addComma(qty) .. "  < x" .. marchslots .. ":  " .. addComma(math.floor(qty*marchslots)) ..        " >\n\nNet Transfer:  " .. addComma(actualTransferPerSlot) .. "  < x" .. marchslots .. ":  " .. addComma(actualTransferPerMarch) .. " >\n\nMarches to Complete x" .. marchslots .. ":  " .. loopCount .. "  < " .. round((slotsToFulfillQty / qty) / marchslots,2) .. " >\n\nMarch Slots to Complete:  " .. slotsToFulfill .. "  < " .. addComma(slotsToFulfillQty) ..      " >\n\nETA:  " .. eta);
+      lsPrintWrapped(10, y, z+10, lsScreenX - 20, 0.7, 0.7, 0xD0D0D0ff, "Trade Total Qty:  " .. addComma(tradetotalqty) .. "\n     Loss from Fee:   -" .. addComma(math.floor(tradetotalqty*tradeMult)) .. "\n\nPlayer Receives:  " .. addComma(math.floor(tradetotalqty - (tradetotalqty*tradeMult)    )) .. "\n\nTrade Fee:  " .. tradepct .. "% :  " .. addComma(transferPerSlot) .. "  < x" .. marchslots .. ":  " .. addComma(transferPerMarch) .. " >\n\nGross Transfer:  " .. addComma(qty) .. "  < x" .. marchslots .. ":  " .. addComma(math.floor(qty*marchslots)) ..        " >\n\nNet Transfer:  " .. addComma(actualTransferPerSlot) .. "  < x" .. marchslots .. ":  " .. addComma(actualTransferPerMarch) .. " >\n\nMarches to Complete x" .. marchslots .. ":  " .. loopCount .. "  < " .. round((slotsToFulfillQty / qty) / marchslots,2) .. " >\n\nMarch Slots to Complete:  " .. slotsToFulfill .. "  < " .. addComma(slotsToFulfillQty) ..      " >\n\nETA:  " .. eta);
 
     end
 
@@ -442,98 +467,46 @@ function promptNumbers(resource)
 end --promptNumbers(resource)
 
 
-function addComma(amount)
-  local formatted = amount
-  while true do  
-    formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
-    if (k==0) then
-      break
-    end
-  end
-  return formatted
-end
-
-
-function tradeButton()
-  trade = nil;
-  tradeWait = 0;
-  maxTradeWait = 4;
-  srClickMouse(castlePos[0], castlePos[1])
-
-
-  while not trade and not shutdown do
-    srReadScreen();
-    trade = srFindImage("trade.png", 12000) -- last number is tolerance. If the image isn't being found or clicked, try raising that value by 1000 at a time until it finds it.
-    if not trade then
-      trade = srFindImage("trade2.png", 12000) -- Try another image if we got Peace Shield activated.
-    end
-
-    tradeWait = tradeWait + 1
-    sleepWithStatus(200, "Waiting for Trade Button to Appear", nil, 0.7, "Waiting " .. tradeWait .. "/" .. maxTradeWait .. " ticks to ReClick Castle");
-      if tradeWait >= maxTradeWait then  -- Wait 1.5s and try to click castle again, using sleepWithStatus 100 above = 15
-        srClickMouse(castlePos[0], castlePos[1])
-        tradeWait = 0
-
-        if not firstTrade then
-          shutdown = 1
-        end
-
-      end
-  end -- while not trade
-
-  if trade then
-    srClickMouse(trade[0], trade[1])
-    firstTrade = 1; -- This denotes we actually got at least one transfer going and not stuck on the initial Trade Not Found when macro starts (the screen needs moved slightly).
-    lsSleep(200)
-  end
-end --tradeButton()
-
-
 function tradeButtonPlus(resource)
-        tradePlus = nil;
-        tradeWait = 0;
-        maxTradeWait = 4;
+  local tradeButtonPlusTolerance = 8000;
+  -- testMode is when we might want to do some tests on modifying the macro but we just want to send 1 resource at a time so we don't run out too fast
+  -- Simply click the + button one time instead of the slider bar.
+  if testMode then
+    xSliderOffset = 0;
+  else
+    xSliderOffset = 40;
+  end
 
-        while not tradePlus do
-          srReadScreen();
-          tradePlus = srFindImage("tradePlus.png", 8000)
-          sleepWithStatus(200, "Waiting for Trade Window to Open", nil, 0.7);
-          tradeWait = tradeWait + 1
+  srClickMouse(castlePos[0], castlePos[1])
+  if not waitForImage("tradePlus.png", 2000, "Waiting for Trade Window", nil, tradeButtonPlusTolerance) then -- Wait 2(2000ms) seconds before giving up and shutdown
+    shutdown = 1;
+  end
 
-          if tradeWait >= maxTradeWait then  -- Wait 1.5s and try to click castle again, using sleepWithStatus 100 above = 15
-            shutdown = 1;
-            break;
-          end
+  if not shutdown then
 
-        end --while
+    tradePlus = srFindImage("tradePlus.png", tradeButtonPlusTolerance)
 
 
-      -- testMode is when we might want to do some tests on modifying the macro but we just want to send 1 resource at a time so we don't run out too fast
-      -- Simply click the + button one time instead of the slider bar.
-      if testMode then
-	  xSliderOffset = 0;
-      else
-	  xSliderOffset = 40;
-      end
+    if resource == 1 then
+      srClickMouse(tradePlus[0]-xSliderOffset, tradePlus[1]+7)
+    elseif resource == 2 then
+      srClickMouse(tradePlus[0]-xSliderOffset, tradePlus[1]+136)
+    elseif resource == 3 then
+      srClickMouse(tradePlus[0]-xSliderOffset, tradePlus[1]+261)
+    elseif resource == 4 then
+      srClickMouse(tradePlus[0]-xSliderOffset, tradePlus[1]+385)
+    end
 
-      if tradePlus then
+    srClickMouse(965, 870) -- Send Button
+    if waitForNoImage("tradePlus.png", 2000, "Waiting for Trade window to disappear", nil, tradeButtonPlusTolerance) then -- Wait 2(2000ms) seconds before giving up and shutdown
+      shutdown = 1;
+      sleepWithStatus(3000, "Trade window is still open for too long -- something is wrong.\n\nAborting ...",nil,0.7,"Returning to Main Menu");
+    end
 
-        if resource == 1 then
-          srClickMouse(tradePlus[0]-xSliderOffset, tradePlus[1]+7)
-        elseif resource == 2 then
-          srClickMouse(tradePlus[0]-xSliderOffset, tradePlus[1]+136)
-        elseif resource == 3 then
-          srClickMouse(tradePlus[0]-xSliderOffset, tradePlus[1]+261)
-        elseif resource == 4 then
-          srClickMouse(tradePlus[0]-xSliderOffset, tradePlus[1]+385)
-        end
+  else -- shutdown is true; give up.
+    sleepWithStatus(3000, "Could not find Plus button in Trade window.\n\nAborting ...",nil,0.7,"Returning to Main Menu");
+  end
 
-        srClickMouse(965, 870) -- Send Button
-        lsSleep(200)
-
-      else
-        shutdown = 1;
-      end
 end --tradeButtonPlus(resource)
 
 
@@ -545,32 +518,35 @@ function main(resource)
     tradetotalqty_food = readSetting("tradetotalqty_food",tradetotalqty_food);
     tradetotalqty = tradetotalqty_food;
     qty = dropdown_qty[1];
+    sendMaxMarchSlots_food = readSetting("sendMaxMarchSlots_food",sendMaxMarchSlots_food);
 
   elseif resource == 2 then
     resourceName = "WOOD"
     tradetotalqty_wood = readSetting("tradetotalqty_wood",tradetotalqty_wood);
     tradetotalqty = tradetotalqty_wood;
     qty = dropdown_qty[1];
+    sendMaxMarchSlots_wood = readSetting("sendMaxMarchSlots_wood",sendMaxMarchSlots_wood);
 
   elseif resource == 3 then
     resourceName = "IRON"
     tradetotalqty_iron = readSetting("tradetotalqty_iron",tradetotalqty_iron);
     tradetotalqty = tradetotalqty_iron;
     qty = dropdown_qty[2];
+    sendMaxMarchSlots_iron = readSetting("sendMaxMarchSlots_iron",sendMaxMarchSlots_iron);
 
   elseif resource == 4 then
     resourceName = "SILVER"
     tradetotalqty_silver = readSetting("tradetotalqty_silver",tradetotalqty_silver);
     tradetotalqty = tradetotalqty_silver;
     qty = dropdown_qty[3];
+    sendMaxMarchSlots_silver = readSetting("sendMaxMarchSlots_silver",sendMaxMarchSlots_silver);
 
   end
 
   slotsToFulfill = math.floor(tradetotalqty / qty)
   slotsToFulfillQty = math.floor(slotsToFulfill * qty)
-  sendEvenMarch = readSetting("sendEvenMarch",sendEvenMarch);
 
-  if sendEvenMarch then
+  if (resource == 1 and sendMaxMarchSlots_food) or (resource == 2 and sendMaxMarchSlots_wood) or (resource == 3 and sendMaxMarchSlots_iron) or (resource == 4 and sendMaxMarchSlots_silver) then
     local recalculate = math.floor(slotsToFulfillQty / (marchslots * qty));
     tradetotalqty = (recalculate * marchslots) * qty;
     slotsToFulfill = math.floor(tradetotalqty / qty)
@@ -602,18 +578,15 @@ function main(resource)
         break;
       end 
 
-      if not finished then
-        tradeButton()
 
-        if shutdown or not trade then
-          break; -- If we didn't find a trade button then abort and go back to main menu
-        end 
+      if not finished then
 
         tradeButtonPlus(resource)
 
         if shutdown then
           break;
         end
+
 
         sleepWithStatus(100, "Sending March " .. i .. " of " .. marchslots, nil, 0.7)
         totalSent = totalSent + qty
@@ -640,7 +613,7 @@ function main(resource)
 
       end -- if not finished
 
-      successfulCastLoc = 1; --zz we got passed tradeButton() and tradeButtonPlus(), must be good?
+      successfulCastLoc = 1; -- We've already recorded the Send button location
 
       if slotsSent == slotsToFulfill then
         finished = 1
@@ -705,8 +678,21 @@ end
 
 
 function round(num, numDecimalPlaces)
+
   local mult = 10^(numDecimalPlaces or 0)
   return math.floor(num * mult + 0.5) / mult
+end
+
+
+function addComma(amount)
+  local formatted = amount
+  while true do  
+    formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+    if (k==0) then
+      break
+    end
+  end
+  return formatted
 end
 
 
