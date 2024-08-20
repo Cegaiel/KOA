@@ -627,8 +627,14 @@ function main(resource)
     while not shutdown do
       marchTimerRemainingRaw = (lsGetTimer() - marchTimer) /1000;
       marchTimerRemaining = math.floor(marchTimerRemainingRaw);
-      marchTimerRemainingReverseRaw = delay - marchTimerRemainingRaw; --zz
+      marchTimerRemainingReverseRaw = delay - marchTimerRemainingRaw;
       marchTimerRemainingReverse = math.floor(marchTimerRemainingReverseRaw);
+
+      if marchTimerRemainingReverseRaw > delay/2 then
+        status = "Sending"
+      else
+        status = "Returning"
+      end
 
       if tonumber(marchTimerRemaining) >= tonumber(delay) then
         break;
@@ -636,7 +642,7 @@ function main(resource)
 
         waitingMessage = "Waiting " .. marchTimerRemaining .. " (" .. marchTimerRemainingReverse .. ") of " .. math.floor(delay) .. "s for this March"
         finishedMessage = "FINISHED"
-        mainMessage = "Tranferring: " .. resourceName .. "\n\nSent " .. slotsSent .. " of " .. slotsToFulfill .. " March Slots\nPasses: " .. j .. " of " .. loopCount .. "  < " .. loopCount - j .. " Remaining >\n\nTotal Gross Sent: " .. addComma(math.floor(totalSent)) .. " of " .. addComma(slotsToFulfillQty) .. "\nTotal Net Sent:    " .. addComma(math.floor(totalNetSent)) .. " of " .. addComma(math.floor(slotsToFulfillQty - qtyAfterFee)) ..  "\n\nN/G Per March: " .. addComma(actualTransferPerMarch) .. " / " .. addComma(math.floor(qty*marchslots)) .. "\nN/G Remaining: " .. addComma(math.floor((slotsToFulfillQty - qtyAfterFee) - totalNetSent)) .. " / " .. addComma(totalRemaining) .. "\n\n" .. eta .."  |  ETA\n" .. getElapsedTime(beginTime) .. "  |  Elapsed\n" .. convertTime(etaRaw - (lsGetTimer()-beginTime)) .. "  |  Remaining\n\n" .. convertTime(marchTimerRemainingReverseRaw*1000) ..  "  | Remaining (This March)"
+        mainMessage = "Tranferring: " .. resourceName .. "  ( " .. status .. " )\n\nSent " .. slotsSent .. " of " .. slotsToFulfill .. " March Slots\nPasses: " .. j .. " of " .. loopCount .. "  < " .. loopCount - j .. " Remaining >\n\nTotal Gross Sent: " .. addComma(math.floor(totalSent)) .. " of " .. addComma(slotsToFulfillQty) .. "\nTotal Net Sent:    " .. addComma(math.floor(totalNetSent)) .. " of " .. addComma(math.floor(slotsToFulfillQty - qtyAfterFee)) ..  "\n\nN/G Per March: " .. addComma(actualTransferPerMarch) .. " / " .. addComma(math.floor(qty*marchslots)) .. "\nN/G Remaining: " .. addComma(math.floor((slotsToFulfillQty - qtyAfterFee) - totalNetSent)) .. " / " .. addComma(totalRemaining) .. "\n\n" .. eta .."  |  ETA\n" .. getElapsedTime(beginTime) .. "  |  Elapsed\n" .. convertTime(etaRaw - (lsGetTimer()-beginTime)) .. "  |  Remaining\n\n" .. convertTime(marchTimerRemainingReverseRaw*1000) ..  "  | Remaining (This March)";
 
 
         sleepWithStatus(200, mainMessage, nil, 0.7, waitingMessage)
