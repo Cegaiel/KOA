@@ -497,7 +497,7 @@ function tradeButtonPlus(resource)
     end
 
     srClickMouse(965, 870) -- Send Button
-    if waitForNoImage("tradePlus.png", 2000, "Waiting for Trade window to disappear", nil, tradeButtonPlusTolerance) then -- Wait 2(2000ms) seconds before giving up and shutdown
+    if waitForNoImage("tradePlus.png", 2000, "Waiting for NO Trade window", nil, tradeButtonPlusTolerance) then -- Wait 2(2000ms) seconds before giving up and shutdown
       shutdown = 1;
       sleepWithStatus(3000, "Trade window is still open for too long -- something is wrong.\n\nAborting ...",nil,0.7,"Returning to Main Menu");
     end
