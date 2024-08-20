@@ -204,10 +204,6 @@ function askResources()
 
 
 --Ceg C
-
-
-
-
 -- :47 seconds appears on Button to Trade
 -- :4 actual seconds appears on timer bar when march is returning
 -- :83 TOTAL - Set Delay, below to this value
@@ -219,9 +215,11 @@ function askResources()
       -- Delay is seconds on button to march to the castle PLUS the seconds when march is returning
     delay = 83;
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    -- Add More characters here with more elseif statements.
 
     end
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     y = y + 40;
 
@@ -266,6 +264,7 @@ function askResources()
   end -- while
 
 end -- askResources()
+
 
 function resetGlobalVariables()
     totalSent = 0;
