@@ -1,10 +1,14 @@
 dofile("common.inc");
 dofile("settings.inc");
 
-delay = 30
 marchslots = 5
 tradepct = 16
 dropdown_qty = {};
+secondsSend = 0;
+secondsReturn = 0;
+delay = 0;
+extraDelay = 0;
+tradeButtonPlusTolerance = 8000;  -- default is 4500; Add higher value here to make sure it's found. This is the + button you see when you open trade window.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 testMode = false; -- Only send 1 (testModeQty) resource at a time. Idea for testing out macro without sending a bunch of resources. Set to true to enable testMode.
@@ -21,7 +25,7 @@ testMode = false; -- Only send 1 (testModeQty) resource at a time. Idea for test
 -- It's better to be safe than sorry. If in doubt choose 4 to be really safe or 5 for maximum safety. However you save about 1 second for every number above 5.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-returnMarchReSend = 3; -- which march # (that's returned) before we start resending resources again
+returnMarchReSend = 4; -- which march # (that's returned) before we start resending resources again
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- ETA is uses delay value that you set for each of your characters in askResources() function.
@@ -46,7 +50,7 @@ dropdown_who_values = {"Ceg A", "Ceg B", "Ceg C"};
 
 
 function doit()
-  askForWindow("Trade Resources to Player from Trading Post\n\nOpen Trading Post, Resource Help, Members tab.");
+  askForWindow("Trade Resources to Player from Trading Post\n\nTap Shift over Bluestacks window to continue!");
   promptOkay("Don\'t Forget !\n\nWhen trading Equip BOTH:\n\nHERO: Sir Dinadan\n\nARMOR: Production (Helm + Greaves)", nil, 0.7, nil, 1, nil)
 
   while 1 do
@@ -115,18 +119,6 @@ function castleLoc()
 end
 
 
-function sendButtonLoc()
-  while not closeX do
-    srReadScreen();
-    closeX = srFindImage("redX_BIG2.png")
-    sleepWithStatus(100,"Searching for RED X", nil, 0.7);
-  end
-    srClickMouse(closeX[0], closeX[1])
-    sleepWithStatus(500,"Closing Red X", nil, 0.7);
-
-end
-
-
 function askResources()
   local scale = 0.8;
   local z = 0;
@@ -178,46 +170,44 @@ function askResources()
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 --Ceg A
--- :31 seconds appears on Button to Trade
--- :22 actual seconds appears on timer bar when march is returning
--- :53 TOTAL - Set Delay, below to this value
 
     if (dropdown_who_cur_value == 1) then
       dropdown_qty = {450000, 90000, 22500}; -- Food/Wood, Iron, Silver - 50% from Dinadin
       marchslots = 5;
       tradepct = 6.5; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
-      -- Delay is seconds on button to march to the castle PLUS the seconds when march is returning
-      delay = 53;
+      secondsSend = 31; -- How many seconds appears on Trade window
+      secondsReturn = 23; -- Seconds that appears on March when march is returning home
 
 
 --Ceg B
--- :28 seconds appears on Button to Trade
--- :21 actual seconds appears on timer bar when march is returning
--- :49 TOTAL - Set Delay, below to this value
 
     elseif (dropdown_who_cur_value == 2) then
       dropdown_qty = {450000, 90000, 22500}; -- Food/Wood, Iron, Silver - 50% from Dinadin
       marchslots = 5;
       tradepct = 6.5; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
-      -- Delay is seconds on button to march to the castle PLUS the seconds when march is returning
-      delay = 49;
+      secondsSend = 28; -- How many seconds appears on Trade window
+      secondsReturn = 23; -- Seconds that appears on March when march is returning home
 
 
 --Ceg C
--- :47 seconds appears on Button to Trade
--- :4 actual seconds appears on timer bar when march is returning
--- :83 TOTAL - Set Delay, below to this value
 
     elseif (dropdown_who_cur_value == 3) then
       dropdown_qty = {450000, 90000, 22500}; -- Food/Wood, Iron, Silver - 50% from Dinadin
       marchslots = 5;
       tradepct = 6.5; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
-      -- Delay is seconds on button to march to the castle PLUS the seconds when march is returning
-    delay = 83;
+      secondsSend = 38; -- How many seconds appears on Trade window
+      secondsReturn = 45; -- Seconds that appears on March when march is returning home
+
+
+------------------------------------------------------------------
 
     -- Add More characters here with more elseif statements.
 
+------------------------------------------------------------------
+
     end
+
+    delay = secondsSend + secondsReturn;
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -467,7 +457,6 @@ end --promptNumbers(resource)
 
 
 function tradeButtonPlus(resource)
-  local tradeButtonPlusTolerance = 8000;
   -- testMode is when we might want to do some tests on modifying the macro but we just want to send 1 resource at a time so we don't run out too fast
   -- Simply click the + button one time instead of the slider bar.
   if testMode then
@@ -577,7 +566,6 @@ function main(resource)
         break;
       end 
 
-
       if not finished then
 
         tradeButtonPlus(resource)
@@ -585,7 +573,6 @@ function main(resource)
         if shutdown then
           break;
         end
-
 
         sleepWithStatus(100, "Sending March " .. i .. " of " .. marchslots, nil, 0.7)
         totalSent = totalSent + qty
@@ -630,10 +617,10 @@ function main(resource)
       marchTimerRemainingReverseRaw = delay - marchTimerRemainingRaw;
       marchTimerRemainingReverse = math.floor(marchTimerRemainingReverseRaw);
 
-      if marchTimerRemainingReverseRaw > delay/2 then
-        status = "Sending"
+      if marchTimerRemainingRaw < secondsSend then
+        status = "Sending March"
       else
-        status = "Returning"
+        status = "March Returning"
       end
 
       if tonumber(marchTimerRemaining) >= tonumber(delay) then
@@ -642,7 +629,7 @@ function main(resource)
 
         waitingMessage = "Waiting " .. marchTimerRemaining .. " (" .. marchTimerRemainingReverse .. ") of " .. math.floor(delay) .. "s for this March"
         finishedMessage = "FINISHED"
-        mainMessage = "Tranferring: " .. resourceName .. "  ( " .. status .. " )\n\nSent " .. slotsSent .. " of " .. slotsToFulfill .. " March Slots\nPasses: " .. j .. " of " .. loopCount .. "  < " .. loopCount - j .. " Remaining >\n\nTotal Gross Sent: " .. addComma(math.floor(totalSent)) .. " of " .. addComma(slotsToFulfillQty) .. "\nTotal Net Sent:    " .. addComma(math.floor(totalNetSent)) .. " of " .. addComma(math.floor(slotsToFulfillQty - qtyAfterFee)) ..  "\n\nN/G Per March: " .. addComma(actualTransferPerMarch) .. " / " .. addComma(math.floor(qty*marchslots)) .. "\nN/G Remaining: " .. addComma(math.floor((slotsToFulfillQty - qtyAfterFee) - totalNetSent)) .. " / " .. addComma(totalRemaining) .. "\n\n" .. eta .."  |  ETA\n" .. getElapsedTime(beginTime) .. "  |  Elapsed\n" .. convertTime(etaRaw - (lsGetTimer()-beginTime)) .. "  |  Remaining\n\n" .. convertTime(marchTimerRemainingReverseRaw*1000) ..  "  | Remaining (This March)";
+        mainMessage = "Resource:  " .. resourceName .. "  ( " .. status .. " )\n\nSent " .. slotsSent .. " of " .. slotsToFulfill .. " March Slots\nPasses: " .. j .. " of " .. loopCount .. "  < " .. loopCount - j .. " Remaining >\n\nTotal Gross Sent: " .. addComma(math.floor(totalSent)) .. " of " .. addComma(slotsToFulfillQty) .. "\nTotal Net Sent:    " .. addComma(math.floor(totalNetSent)) .. " of " .. addComma(math.floor(slotsToFulfillQty - qtyAfterFee)) ..  "\n\nN/G Per March: " .. addComma(actualTransferPerMarch) .. " / " .. addComma(math.floor(qty*marchslots)) .. "\nN/G Remaining: " .. addComma(math.floor((slotsToFulfillQty - qtyAfterFee) - totalNetSent)) .. " / " .. addComma(totalRemaining) .. "\n\n" .. eta .."  |  ETA\n" .. getElapsedTime(beginTime) .. "  |  Elapsed\n" .. convertTime(etaRaw - (lsGetTimer()-beginTime)) .. "  |  Remaining\n\n" .. convertTime(marchTimerRemainingReverseRaw*1000) ..  "  | Remaining (This March)";
 
 
         sleepWithStatus(200, mainMessage, nil, 0.7, waitingMessage)
@@ -683,7 +670,6 @@ end
 
 
 function round(num, numDecimalPlaces)
-
   local mult = 10^(numDecimalPlaces or 0)
   return math.floor(num * mult + 0.5) / mult
 end
