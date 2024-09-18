@@ -46,6 +46,8 @@ function doit()
   askForWindow("Trade Resources to Player by clicking a neighboring castle");
   promptOkay("Don\'t Forget !\n\nWhen trading Equip BOTH:\n\nHERO: Sir Dinadan\n\nARMOR: Production (Helm + Greaves)", nil, 0.7, nil, 1, nil)
 
+  checkWindowSize();
+
   while 1 do
     askResources()
 
@@ -810,5 +812,16 @@ function stfu()
     srClickMouse(shout[0]+5,shout[1],1);
     lsPlaySound("beepping.wav");
   lsSleep(100)
+  end
+end
+
+function checkWindowSize()
+  while 1 do
+    srReadScreen();
+    local windowSize = srGetWindowSize();
+    if windowSize[0] == 1751 and windowSize[1] == 985 then
+      break;
+    end
+    statusScreen("Current Window Size: " .. windowSize[0] .. "x" .. windowSize[1] .. "\n\nTarget Window Size: 1751x985\n\nStart resizing Blue Stacks window (from a corner) until target size matches!", nil, nil, 0.7);
   end
 end

@@ -177,7 +177,7 @@ function askResources()
       dropdown_qty = {450000, 90000, 22500}; -- Food/Wood, Iron, Silver - 50% from Dinadin
       marchslots = 5;
       tradepct = 6.5; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
-      secondsSend = 31; -- How many seconds appears on Trade window
+      secondsSend = 28; -- How many seconds appears on Trade window
       secondsReturn = 23; -- Seconds that appears on March when march is returning home
 
 
@@ -197,8 +197,8 @@ function askResources()
       dropdown_qty = {450000, 90000, 22500}; -- Food/Wood, Iron, Silver - 50% from Dinadin
       marchslots = 5;
       tradepct = 6.5; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
-      secondsSend = 38; -- How many seconds appears on Trade window
-      secondsReturn = 45; -- Seconds that appears on March when march is returning home
+      secondsSend = 28; -- How many seconds appears on Trade window
+      secondsReturn = 34; -- Seconds that appears on March when march is returning home
 
 
 ------------------------------------------------------------------
@@ -623,9 +623,9 @@ function main(resource)
 	if netRemaining < 0 then netRemaining = 0; end
 
       if marchTimerRemainingRaw < secondsSend then
-        status = "Sending March"
+        status = ">> Sending March >>"
       else
-        status = "March Returning"
+        status = "<< March Returning <<"
       end
 
       if tonumber(marchTimerRemaining) >= tonumber(delay) then
@@ -802,6 +802,6 @@ function checkWindowSize()
     if windowSize[0] == 1751 and windowSize[1] == 985 then
       break;
     end
-    statusScreen("Current Window Size: " .. windowSize[0] .. "x" .. windowSize[1] .. "\n\nTarget is 1751x985\n\nKeep resizing until you hit target", nil, nil, 0.7);
+    statusScreen("Current Window Size: " .. windowSize[0] .. "x" .. windowSize[1] .. "\n\nTarget Window Size: 1751x985\n\nStart resizing Blue Stacks window (from a corner) until target size matches!", nil, nil, 0.7);
   end
 end

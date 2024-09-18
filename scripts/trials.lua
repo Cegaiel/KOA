@@ -1,113 +1,116 @@
 dofile("common.inc");
 dofile("constants.inc");
 
+waitTime = 2000; -- How many ms (1000 = 1 second) to wait for an image to appear before giving up
 
 function doit()
 
-	askForWindow("Trials");  
+	askForWindow("Trials Assistance. This will allow you to Tap Shift button over Castle to quickly attack it and close window out.\n\nYou can then Tap Alt button over a chest to quickly loot it.\n\nMouse over Blue Stacks window and press Shift key to continue.");  
 	
+  checkWindowSize();
 
   while 1 do
     pos = getMousePos();
 
-
-  if lsShiftHeld() then
-    while lsShiftHeld() do
-      sleepWithStatus(100, "Release Shift Key", nil, 0.7)
+    if lsShiftHeld() then
+      while lsShiftHeld() do
+        sleepWithStatus(100, "Release Shift Key", nil, 0.7)
+      end
+      lastPos = pos
+      sleepWithStatus(100, "Fight!", nil, 0.7)
+      fight();
     end
-  lastPos = pos
-  sleepWithStatus(100, "Fight!", nil, 0.7)
-  fight()
-end
 
-
-
-  if lsAltHeld() then
-    while lsAltHeld() do
-      sleepWithStatus(100, "Release Alt Key", nil, 0.7)
+    if lsAltHeld() then
+      while lsAltHeld() do
+        sleepWithStatus(100, "Release Alt Key", nil, 0.7)
+      end
+      lastPos = pos
+      sleepWithStatus(100, "Looting!", nil, 0.7)
+      loot();
     end
-  lastPos = pos
-  sleepWithStatus(100, "Looting!", nil, 0.7)
-  loot()
-end
 
-
-  sleepWithStatus(100, "Tap SHIFT Castle to Fight.\n\nTap ALT over Chest to Loot\n\nPos: " .. pos[0] .. ", " .. pos[1], nil, 0.7)
-
-
+    sleepWithStatus(100, "Tap SHIFT over Castle (near center) to Fight.\n\nTap ALT over Chest to Loot\n\nPos: " .. pos[0] .. ", " .. pos[1], nil, 0.7)
   end
 end
 
 
 function fight()
-local bigX2 = nil;
-local bbigX2 = nil;
-local marchWait = 0;
-local marchAttempts = 0;
+  local fail = nil;
   srClickMouse(pos[0], pos[1]) -- Click on Castle
   sleepWithStatus(500, "Clicking Castle", nil, 0.7)
   srClickMouse(pos[0]+175, pos[1]) -- Click on Challenge
-  sleepWithStatus(500, "Clicking Challenge", nil, 0.7)
-  srClickMouse(1400, 875)  -- Click March Button
-  sleepWithStatus(500, "Clicking March", nil, 0.7)
-
-
-
-
-while not bigX2 do
-srReadScreen();
-bigX2 = srFindImage("redX_BIG2.png",10000);
-marchWait = marchWait + 1;
-if marchWait == 3 then -- 1 second since each wait is 100ms
-  sleepWithStatus(100, "Trying March again", nil, 0.7)
-  marchWait = 0;
-  srClickMouse(1400, 875)  -- Click March Button
-  marchAttempts = marchAttempts + 1;
-end
-sleepWithStatus(100, "Searching for Red X", nil, 0.7)
-
-if marchAttempts == 2 then
-  break;
-end
-
-
-end 
-
-
-if bigX2 then
-  srClickMouse(bigX2[0]+20, bigX2[1]+20)  -- Click Collect Red X (Big 2)
-else
-  srClickMouse(1547, 154)  -- Click Collect Red X (Big 2)
-end
-
-sleepWithStatus(100, "Clicked Red X", nil, 0.7)
-
-
-while not bbigX2 do
-  srReadScreen();
-  bbigX2 = srFindImage("beigeX_BIG2.png");
-  marchWait = marchWait + 1;
-  if marchWait == 3 then -- 1 second since each wait is 100ms
-    break;
-  end
-sleepWithStatus(100, "Searching for Beige X", nil, 0.7)
-end 
-
-
-if bbigX2 then
-  srClickMouse(bbigX2[0]+20, bbigX2[1]+20);
-  sleepWithStatus(100, "Clicked Beige X", nil, 0.7)
+  sleepWithStatus(100, "Clicking Challenge", nil, 0.7)
+  if waitForImage("march.png", waitTime, "Waiting for March button") then
+    local march = srFindImage("march.png");
+    srClickMouse(march[0],march[1]);
+    sleepWithStatus(100, "Clicking March", nil, 0.7)
   else
-    srClickMouse(1591, 91)  -- Click Collect Beige X
+    fail = 1;
   end
+
+  if not fail then 
+
+    if waitForImage("redX_BIG2.png", waitTime, "Waiting for Red X button") then
+      srKeyDown(VK_ESCAPE);
+      lsSleep(100);
+      srKeyUp(VK_ESCAPE);
+      lsSleep(100);
+    else
+      sleepWithStatus(500, "Could not find Red X button, giving up", nil, 0.7)
+    end
+
+    if waitForImage("beigeX_BIG2.png", waitTime, "Waiting for Beige X button") then
+      srKeyDown(VK_ESCAPE);
+      lsSleep(100);
+      srKeyUp(VK_ESCAPE);
+      lsSleep(100);
+    else
+      sleepWithStatus(500, "Could not find Beige X button, giving up", nil, 0.7)
+    end
+
+  else -- if not fail
+
+    while 1 do
+      if lsShiftHeld() then
+        while lsShiftHeld() do
+          sleepWithStatus(100, "Release Shift Key", nil, 0.7)
+        end
+        break;
+      else -- if lsShiftHeld()
+        sleepWithStatus(100, "Could not find March button, giving up\n\nBe sure you are clicking near the center of castle; otherwise the click offset might miss the Challenge button!\n\nTap Shift to exit this message.", nil, 0.7)
+      end -- if lsShiftHeld()
+
+    end -- while
+
+  end -- if not fail
+
   srSetMousePos(lastPos[0], lastPos[1])
 end
 
 
 function loot()
   srClickMouse(pos[0], pos[1]) -- Click on Chest
-sleepWithStatus(100, "Clicked Chest", nil, 0.7)
-  srClickMouse(930, 673)  -- Click Collect Button
-sleepWithStatus(100, "Clicked Collect Button", nil, 0.7)
+  sleepWithStatus(150, "Clicked Chest", nil, 0.7)
+
+  if waitForImage("collect.png", waitTime, "Waiting for Collect button") then
+    local collect = srFindImage("collect.png");
+    srClickMouse(collect[0],collect[1]);
+    sleepWithStatus(150, "Clicked Collect Button", nil, 0.7)
+  else
+    sleepWithStatus(500, "Could not find Collect button, giving up", nil, 0.7)
+  end
+
   srSetMousePos(lastPos[0], lastPos[1])
+end
+
+function checkWindowSize()
+  while 1 do
+    srReadScreen();
+    local windowSize = srGetWindowSize();
+    if windowSize[0] == 1751 and windowSize[1] == 985 then
+      break;
+    end
+    statusScreen("Current Window Size: " .. windowSize[0] .. "x" .. windowSize[1] .. "\n\nTarget Window Size: 1751x985\n\nStart resizing Blue Stacks window (from a corner) until target size matches!", nil, nil, 0.7);
+  end
 end
