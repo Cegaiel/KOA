@@ -183,7 +183,7 @@ function askResources()
 -- :53 TOTAL - Set Delay, below to this value
 
     if (dropdown_who_cur_value == 1) then
-      dropdown_qty = {450000, 90000, 22500}; -- Food/Wood, Iron, Silver - 50% from Dinadin
+      dropdown_qty = {480000, 96000, 24000}; -- Food/Wood, Iron, Silver - 50% from Dinadin
       marchslots = 5;
       tradepct = 6.5; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
       -- Delay is seconds on button to march to the castle PLUS the seconds when march is returning
@@ -196,7 +196,7 @@ function askResources()
 -- :49 TOTAL - Set Delay, below to this value
 
     elseif (dropdown_who_cur_value == 2) then
-      dropdown_qty = {450000, 90000, 22500}; -- Food/Wood, Iron, Silver - 50% from Dinadin
+      dropdown_qty = {480000, 96000, 24000}; -- Food/Wood, Iron, Silver - 50% from Dinadin
       marchslots = 5;
       tradepct = 6.5; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
       -- Delay is seconds on button to march to the castle PLUS the seconds when march is returning
@@ -209,7 +209,7 @@ function askResources()
 -- :83 TOTAL - Set Delay, below to this value
 
     elseif (dropdown_who_cur_value == 3) then
-      dropdown_qty = {450000, 90000, 22500}; -- Food/Wood, Iron, Silver - 50% from Dinadin
+      dropdown_qty = {480000, 96000, 24000}; -- Food/Wood, Iron, Silver - 50% from Dinadin
       marchslots = 5;
       tradepct = 6.5; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
       -- Delay is seconds on button to march to the castle PLUS the seconds when march is returning
