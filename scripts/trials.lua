@@ -43,8 +43,10 @@ function fight()
   sleepWithStatus(100, "Clicking Challenge", nil, 0.7)
   if waitForImage("march.png", waitTime, "Waiting for March button") then
     local march = srFindImage("march.png");
-    srClickMouse(march[0],march[1]);
     sleepWithStatus(100, "Clicking March", nil, 0.7)
+    srClickMouse(march[0],march[1]);
+lsSleep(100);
+    srClickMouse(march[0],march[1]);
   else
     fail = 1;
   end

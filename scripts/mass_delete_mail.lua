@@ -2,6 +2,7 @@ dofile("common.inc");
 
 waitTime = 2000; -- How many ms (1000 = 1 second) to wait for an image to appear before giving up
 remaining = 5; -- How many more times to delete after the 99+ mail indicator is no longer found
+--ignore99 = 1;
 
 function doit()
 
@@ -10,7 +11,10 @@ function doit()
   checkWindowSize();
 
 
-  if waitForImage("mail_99_plus.png", waitTime, "Verifying you have 99+ mails indicator") then
+  if ignore99 == 1 then
+    sleepWithStatus(1500, "Ignore99 is true, continuing without 99+ icon verification", nil, 0.7)
+    can_continue = 1;
+  elseif waitForImage("mail_99_plus.png", waitTime, "Verifying you have 99+ mails indicator") then
     sleepWithStatus(1500, "FOUND 99+ mail indicator, continuing...", nil, 0.7)
     can_continue = 1;
   else
@@ -28,7 +32,9 @@ function doit()
     break;
   end
 
-  if not waitForImage("mail_99_plus.png", 1000, "Verifying 99+ mail indicator") then
+  if ignore99 == 1 then
+  -- Do Nothing
+  elseif not waitForImage("mail_99_plus.png", 1000, "Verifying 99+ mail indicator") then
     sleepWithStatus(1000, "Less than 99 mails remaining - Will Shut Down after " .. remaining .. " more deletes!", nil, 0.7)
     remaining = remaining - 1;
   end
