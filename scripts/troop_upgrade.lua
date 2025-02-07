@@ -1,7 +1,7 @@
 dofile("common.inc");
 dofile("constants.inc");
 
-waitTime = 200; -- How many ms (1000 = 1 second) to wait for an image to appear before giving up
+waitTime = 100; -- How many ms (1000 = 1 second) to wait for an image to appear before giving up
 tolerance = 6000; -- Image tolerance to find it -- Default is 4500 when no tolerance is specified
 
 function doit()

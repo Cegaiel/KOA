@@ -174,9 +174,9 @@ function askResources()
 --Ceg A
 
     if (dropdown_who_cur_value == 1) then
-      dropdown_qty = {480000, 96000, 24000}; -- Food/Wood, Iron, Silver - 50% from Dinadin
+      dropdown_qty = {600000, 120000, 30000}; -- Food/Wood, Iron, Silver - 50% from Dinadin
       marchslots = 5;
-      tradepct = 6.5; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
+      tradepct = 10.0; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
       secondsSend = 28; -- How many seconds appears on Trade window
       secondsReturn = 23; -- Seconds that appears on March when march is returning home
 
@@ -184,9 +184,9 @@ function askResources()
 --Ceg B
 
     elseif (dropdown_who_cur_value == 2) then
-      dropdown_qty = {480000, 96000, 24000}; -- Food/Wood, Iron, Silver - 50% from Dinadin
+      dropdown_qty = {600000, 120000, 30000}; -- Food/Wood, Iron, Silver - 50% from Dinadin
       marchslots = 5;
-      tradepct = 6.5; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
+      tradepct = 10.0; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
       secondsSend = 28; -- How many seconds appears on Trade window
       secondsReturn = 23; -- Seconds that appears on March when march is returning home
 
@@ -194,9 +194,9 @@ function askResources()
 --Ceg C
 
     elseif (dropdown_who_cur_value == 3) then
-      dropdown_qty = {480000, 96000, 24000}; -- Food/Wood, Iron, Silver - 50% from Dinadin
+      dropdown_qty = {600000, 120000, 30000}; -- Food/Wood, Iron, Silver - 50% from Dinadin
       marchslots = 5;
-      tradepct = 6.5; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
+      tradepct = 10.0; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
       secondsSend = 28; -- How many seconds appears on Trade window
       secondsReturn = 34; -- Seconds that appears on March when march is returning home
 
