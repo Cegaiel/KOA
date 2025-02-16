@@ -101,17 +101,6 @@ lsSleep(500);
   end -- while
 end
 
-function checkWindowSize()
-  while 1 do
-    srReadScreen();
-    local windowSize = srGetWindowSize();
-    if windowSize[0] == 1751 and windowSize[1] == 985 then
-      break;
-    end
-    statusScreen("Current Window Size: " .. windowSize[0] .. "x" .. windowSize[1] .. "\n\nTarget Window Size: 1751x985\n\nStart resizing Blue Stacks window (from a corner) until target size matches!", nil, nil, 0.7);
-  end
-end
-
 function checkClaimGreen()
 -- This might mean we've already upgraded all the troops.
     if waitForImage("training/claim_green.png", waitTime, "Checking for Green: Claim All button", nil, tolerance) then

@@ -6,8 +6,9 @@ stfuImageTolerance = 5000;
 
 function doit()
 
-	askForWindow("STFU out of Shout Boxes.\n\nLooks for Kingdom Shout messages and closes the X button when found");  
+  askForWindow("STFU out of Shout Boxes.\n\nLooks for Kingdom Shout messages and closes the X button when found");  
 
+  checkWindowSize();
 
   while 1 do
     stfu()

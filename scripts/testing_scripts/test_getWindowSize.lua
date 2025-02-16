@@ -1,3 +1,5 @@
+-- function checkWindowSize() exists in common.inc and can added to any script.
+
 dofile("common.inc");
 
 function doit()
@@ -16,6 +18,6 @@ function doit()
       playSound = nil;
       message = "Start resizing Blue Stacks window (from a corner) until target size matches!";
     end
-    statusScreen("Current Window Size: " .. windowSize[0] .. "x" .. windowSize[1] .. "\n\nTarget is 1751x985\n\n" .. message, nil, nil, 0.7);
+    statusScreen("Current Window Size: " .. windowSize[0] .. "x" .. windowSize[1] .. "\n\nTarget Window Size: 1751x985\n\n" .. message, nil, nil, 0.7);
   end
 end
