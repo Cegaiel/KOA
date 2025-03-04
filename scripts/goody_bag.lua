@@ -7,7 +7,7 @@ Tolerance = 5000;
 
 function doit()
 
-	askForWindow("Click Claim link (in Alliance Chat) and it will click the Open button.\n\nOr Click the bag icon (in Alliance Chat) then click the bag actual bag to distribute. This will click Distribute button\n\nEither option will close the window when done.\n\nClaim/Open does NOT offer any Thanks.");  
+	askForWindow("Click Claim link (in Alliance Chat) and it will click the Open button. Tip: Go to Kingdom Chat and click the x Good Bags left to claim window. This method you won't have to find Claim Links!\n\nOr Click the bag icon (in Alliance Chat) then click the bag actual bag to distribute. This will click Distribute button\n\nEither option will close the window when done.\n\nClaim/Open does NOT offer any Thanks.");  
 
   checkWindowSize();
 
@@ -31,7 +31,7 @@ function look()
     srClickMouse(btnDistribute[0],btnDistribute[1]);
     sleepWithStatus(1000, "Clicked Distribute Button...");
     srReadScreen();
-    local btnBag = srFindImage("good_bag_icon.png", Tolerance);
+    local btnBag = srFindImage("goody_bag_icon.png", Tolerance);
     if btnBag then
       srClickMouse(btnBag[0],btnBag[1]);
       lsSleep(100);

@@ -3,13 +3,15 @@ dofile("constants.inc");
 
 waitTime = 100; -- How many ms (1000 = 1 second) to wait for an image to appear before giving up
 tolerance = 6000; -- Image tolerance to find it -- Default is 4500 when no tolerance is specified
+checkedGray = 0;
+
 
 function doit()
 
   askForWindow("Troop Upgrade\n\nSelect the troop you are upgrading so that the GREEN Upgrade button is showing BEFORE you begin!\n\nMouse over Blue Stacks window and press Shift key to continue.");  
   checkWindowSize();
 
-  if waitForImage("training/upgrade_button.png", waitTime, "Verifying Green Upgrade button is showing") then
+  if waitForImage("training/upgrade_button.png", waitTime, "Verifying Green Upgrade button showing") then
     sleepWithStatus(1500, "Green Upgrade button found, continuing...", nil, 0.7)
     can_continue = 1;
   else
@@ -19,7 +21,7 @@ function doit()
   while can_continue do
     checkBreak();
 
-    if waitForImage("training/upgrade_button.png", waitTime, "Verifying Green Upgrade button is showing", nil, tolerance) then
+    if waitForImage("training/upgrade_button.png", waitTime, "Verifying Green Upgrade button showing", nil, tolerance) then
       local upgrade = srFindImage("training/upgrade_button.png");
       srClickMouse(upgrade[0],upgrade[1]);
       sleepWithStatus(100, "Clicking Upgrade button", nil, 0.7)
@@ -56,6 +58,7 @@ lsSleep(500);
       if blue_use_all then
         srClickMouse(blue_use_all[0],blue_use_all[1]);
         sleepWithStatus(100, "Clicking Blue: Use All button", nil, 0.7)
+        checkedGray = 0;
       end
     end
 
@@ -66,6 +69,7 @@ lsSleep(500);
       if green_use_all then
         srClickMouse(green_use_all[0],green_use_all[1]);
         sleepWithStatus(100, "Clicking Green: Use All button", nil, 0.7)
+        checkedGray = 0;
       end
     end
 
@@ -74,6 +78,7 @@ lsSleep(500);
       if blue_claim then
         srClickMouse(blue_claim[0],blue_claim[1]);
         sleepWithStatus(100, "Clicking Blue: Claim All button", nil, 0.7)
+        checkedGray = 0;
       end
     end
 
@@ -86,12 +91,13 @@ lsSleep(500);
       if blue_speed_up then
         srClickMouse(blue_speed_up[0],blue_speed_up[1]);
         sleepWithStatus(100, "Clicking Blue: Speed Up button", nil, 0.7)
+        checkedGray = 0;
       end
     end
 
 
     -- Sometimes a popup "The Time exceeded 00:xx:xx will be wasted after using Auto Speedup. Confirm to use?"
-    if waitForImage("training/confirm_yes.png", waitTime, "Checking for Confirm Speedup is Wasted", nil, tolerance) then
+    if waitForImage("training/confirm_yes.png", waitTime, "Checking Confirm Speedup is Wasted", nil, tolerance) then
       local confirm_yes = srFindImage("training/confirm_yes.png");
       if confirm_yes then
         srClickMouse(confirm_yes[0],confirm_yes[1]);
@@ -123,17 +129,30 @@ function checkGrayButtons()
 -- A gray Use All (speeds) button MIGHT appear here.
 -- Check for Gray Use All button. This will appear when game is being stupid. Just close it out
 -- We will check for three possible Gray buttons. I've found that sometimes one button will not be found, when it should.
+  local foundGray = nil;
+  checkedGray = checkedGray +1;
 
-    if waitForImage("training/use_all_gray.png", waitTime, "Checking for GRAY USE ALL", nil, tolerance) then
-      sleepWithStatus(100,"ISSUE: Found Gray Use All Button: Preparing ESC KEY");
+    if waitForImage("training/use_all_gray.png", waitTime, "Checking for GRAY USE ALL\n\nChecked Gray: " .. checkedGray .. " times", nil, tolerance) then
       UseAllGrayButton1 = srFindImage("training/use_all_gray.png")
       UseAllGrayButton2 = srFindImage("training/use_all_gray2.png")
       UseAllGrayButton3 = srFindImage("training/use_all_gray3.png")
-      --Hit Esc key
-      srKeyDown(VK_ESCAPE);
-      lsSleep(100);
-      srKeyUp(VK_ESCAPE);
-      lsSleep(100);
+
+      if UseAllGrayButton1 or UseAllGrayButton2 or UseAllGrayButton3 then
+        foundGray = 1
+      end
+
+      if foundGray or checkedGray >= 4 then
+         sleepWithStatus(100,"ISSUE: Found Gray Use All Button: Preparing ESC KEY");
+        --Hit Esc key
+        srKeyDown(VK_ESCAPE);
+        lsSleep(100);
+        srKeyUp(VK_ESCAPE);
+        lsSleep(100);
+        checkedGray = 0;
+      end
+      if checkedGray >= 10 then
+         can_continue = 0;
+      end
    end
 
   if not UseAllGrayButton1 and UseAllGrayButton2 then
@@ -146,6 +165,4 @@ function checkGrayButtons()
         lsSleep(100);
      end
   end
-
-
 end
