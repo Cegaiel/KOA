@@ -4,7 +4,7 @@ dofile("constants.inc");
 waitTime = 100; -- How many ms (1000 = 1 second) to wait for an image to appear before giving up
 tolerance = 6000; -- Image tolerance to find it -- Default is 4500 when no tolerance is specified
 checkedGray = 0;
-
+abort = 0;
 
 function doit()
 
@@ -12,27 +12,26 @@ function doit()
   checkWindowSize();
 
   if waitForImage("training/upgrade_button.png", waitTime, "Verifying Green Upgrade button showing") then
-    sleepWithStatus(1500, "Green Upgrade button found, continuing...", nil, 0.7)
+    sleepWithStatus(1500, "Green Upgrade button FOUND, continuing...", nil, 0.7)
     can_continue = 1;
   else
     sleepWithStatus(2000, "Green Upgrade button NOT found, Shutting down!", nil, 0.7)
   end
 
-  while can_continue do
+  while can_continue and abort == 0 do
     checkBreak();
-
     if waitForImage("training/upgrade_button.png", waitTime, "Verifying Green Upgrade button showing", nil, tolerance) then
       local upgrade = srFindImage("training/upgrade_button.png");
       srClickMouse(upgrade[0],upgrade[1]);
       sleepWithStatus(100, "Clicking Upgrade button", nil, 0.7)
     end
 
-
     -- Check Slider Bar before clicking Level up
     if waitForImage("training/gold_plus.png", waitTime, "Looking for Slider Bar/Plus button", nil, tolerance) then
       local gold_plus = srFindImage("training/gold_plus.png");
       if gold_plus then
         srClickMouse(gold_plus[0]-52,gold_plus[1]+10);
+        --srClickMouse(gold_plus[0]-60,gold_plus[1]+10);
         lsSleep(100);
         srClickMouse(gold_plus[0]-52,gold_plus[1]+10);
        sleepWithStatus(100, "Clicking Max on Slider Bar", nil, 0.7)
@@ -132,37 +131,25 @@ function checkGrayButtons()
   local foundGray = nil;
   checkedGray = checkedGray +1;
 
-    if waitForImage("training/use_all_gray.png", waitTime, "Checking for GRAY USE ALL\n\nChecked Gray: " .. checkedGray .. " times", nil, tolerance) then
       UseAllGrayButton1 = srFindImage("training/use_all_gray.png")
       UseAllGrayButton2 = srFindImage("training/use_all_gray2.png")
-      UseAllGrayButton3 = srFindImage("training/use_all_gray3.png")
+      --UseAllGrayButton3 = srFindImage("training/use_all_gray3.png")
 
       if UseAllGrayButton1 or UseAllGrayButton2 or UseAllGrayButton3 then
         foundGray = 1
       end
 
       if foundGray or checkedGray >= 4 then
-         sleepWithStatus(100,"ISSUE: Found Gray Use All Button: Preparing ESC KEY");
+         sleepWithStatus(100,"ISSUE: Found Gray Use All Button: Using ESC KEY\n\nCheckedGray Counter: " .. checkedGray);
         --Hit Esc key
         srKeyDown(VK_ESCAPE);
         lsSleep(100);
         srKeyUp(VK_ESCAPE);
         lsSleep(100);
-        checkedGray = 0;
       end
-      if checkedGray >= 10 then
-         can_continue = 0;
-      end
-   end
 
-  if not UseAllGrayButton1 and UseAllGrayButton2 then
-      if waitForImage("training/use_all_gray2.png", waitTime, "Checking for GRAY USE ALL 2", nil, tolerance) then
-        sleepWithStatus(100,"ISSUE: Found Gray Use All Button 2: Preparing ESC KEY");
-        --Hit Esc key
-        srKeyDown(VK_ESCAPE);
-        lsSleep(100);
-        srKeyUp(VK_ESCAPE);
-        lsSleep(100);
-     end
-  end
+      if checkedGray >= 10 then
+         abort = 1;
+      end
+
 end

@@ -2,7 +2,7 @@ dofile("common.inc");
 dofile("constants.inc");
 
 waitTime = 200; -- How many ms (1000 = 1 second) to wait for an image to appear before giving up
-tolerance = 6000; -- Image tolerance to find it -- Default is 4500 when no tolerance is specified
+tolerance = 4500; -- Image tolerance to find it -- Default is 4500 when no tolerance is specified
 
 function doit()
   askForWindow("Troop Training\n\nSelect the troop you are training so that the BLUE TRAIN button is showing BEFORE you begin!\n\nMouse over Blue Stacks window and press Shift key to continue.");  
