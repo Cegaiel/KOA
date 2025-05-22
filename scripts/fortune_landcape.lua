@@ -4,15 +4,19 @@ dofile("settings.inc");
 
 
 Tolerance = 5000;
-diceDelay = 5000;
+diceDelay = 4500;
 
 function doit()
 
-  askForWindow("Fortune Landscape: Clicks Fate Cards and attempts to change to On the House, Major Haul and optionally 777.\n\nYou will Tap Shift key each time to change cards and roll dice.\n\nBe sure macro works well first before trying Full Auto Mode!");  
+  askForWindow("Fortune Landscape: Clicks Fate Cards and attempts to change to On the House, Major Haul and optionally 777.\n\nYou will Tap Shift key each time to change cards and roll dice.\n\nBe sure macro works well first before trying Full Auto Mode!\n\nPut Automato on far left side of screen so it doesn't cover large fate card images (middle) or small fate card or dice on bottom right.");  
 
   checkWindowSize();
 
   config();
+
+  if doAuto then
+    sleepWithStatus(2500,"Preparing to start Full Auto Mode!\n\nHands off the mouse!", nil, 0.7);
+  end
 
   while 1 do
     main()
@@ -22,8 +26,9 @@ end
 
 function main()
 
-  if not doAuto then
-
+if doAuto then
+  checkBreak();
+else
   while not lsShiftHeld() do
     sleepWithStatus(100,"Tap Shift to Change Fate Cards.", nil, 0.7);
   end
@@ -31,10 +36,7 @@ function main()
   while lsShiftHeld() do
     sleepWithStatus(100,"Release Shift Key", nil, 0.7);
   end
-
-  else
-    sleepWithStatus(100,"Running in Full Auto Mode.", nil, 0.7);
-  end
+end
 
 
   srReadScreen();
@@ -47,17 +49,17 @@ function main()
   local confirm = srFindImage("fortune/confirm.png", Tolerance);
   if confirm then
     srClickMouse(confirm[0], confirm[1])
-    sleepWithStatus(1000,"Found/Clicked Confirm button to Clear screen", nil, 0.7);
+    sleepWithStatus(500,"Found/Clicked Confirm button to Clear screen", nil, 0.7);
   end
 
   if fateCard then -- Found Generic/Brown card, so change it
     srClickMouse(fateCard[0], fateCard[1])
-    sleepWithStatus(1000,"Found/Clicked Generic/Brown Fate Card", nil, 0.7);
+    sleepWithStatus(500,"Found/Clicked Generic/Brown Fate Card", nil, 0.7);
 
     changeFateCards();
 
     if rollDice() then
-      sleepWithStatus(diceDelay,"Rolling Dice!", nil, 0.7);
+      sleepWithStatus(diceDelay,"Rolling Dice", nil, 0.7);
       -- Check if rewards window is open and close it
       checkRewardsConfirmButton();
     else
@@ -66,10 +68,10 @@ function main()
 
 
   elseif fateCard2 or (fateCard3 and doSeven) or fateCard4 then -- Found an existing desirable card; keep it!
-    sleepWithStatus(1000,"Found existing desirable card", nil, 0.7);
+    sleepWithStatus(500,"Found existing desirable card", nil, 0.7);
 
     if rollDice() then
-      sleepWithStatus(diceDelay,"Rolling Dice!", nil, 0.7);
+      sleepWithStatus(diceDelay,"Rolling Dice", nil, 0.7);
       -- Check if rewards window is open and close it
       checkRewardsConfirmButton();
     else
@@ -78,13 +80,13 @@ function main()
 
 
   elseif fateDetails then
-    sleepWithStatus(1000,"Undesirable card seems loaded, change it!", nil, 0.7);
+    sleepWithStatus(500,"Undesirable card seems loaded, CHANGE IT!", nil, 0.7);
     srClickMouse(fateDetails[0]+100, fateDetails[1]-50)
 
     changeFateCards();
 
     if rollDice() then
-      sleepWithStatus(diceDelay,"Rolling Dice!", nil, 0.7);
+      sleepWithStatus(diceDelay,"Rolling Dice", nil, 0.7);
       -- Check if rewards window is open and close it
       checkRewardsConfirmButton();
     else
@@ -104,7 +106,7 @@ function changeCard()
   local changeCard = srFindImage("fortune/change_card.png", Tolerance);
   if changeCard then
     srClickMouse(changeCard[0], changeCard[1])
-    sleepWithStatus(700,"Clicked Change Card", nil, 0.7);
+    sleepWithStatus(500,"Clicked Change Card", nil, 0.7);
     return true;
    end
   return false;
@@ -147,7 +149,7 @@ function ESCKey()
   lsSleep(100);
   srKeyUp(VK_ESCAPE);
   --lsSleep(100);
-  sleepWithStatus(500,"Escape Key used ...", nil, 0.7);
+  sleepWithStatus(200,"Escape Key used", nil, 0.7);
 end
 
 
@@ -158,7 +160,7 @@ function checkRewardsConfirmButton()
 
   if confirm then
     srClickMouse(confirm[0], confirm[1])
-    sleepWithStatus(1000,"Found/Clicked Confirm button to Clear screen", nil, 0.7);
+    sleepWithStatus(500,"Found/Clicked Confirm button to Clear screen", nil, 0.7);
 
     -- Check if Rewards window is still open behind the recently close Confirm button
     srReadScreen();
