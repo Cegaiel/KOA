@@ -4,7 +4,8 @@ dofile("settings.inc");
 
 
 Tolerance = 5000;
-diceDelay = 4500;
+diceDelay = 4200;
+moreFeedback = false;
 
 function doit()
 
@@ -45,8 +46,8 @@ end
   local fateCard3 = srFindImage("fortune/777_small.png", Tolerance);
   local fateCard4 = srFindImage("fortune/major_haul_small.png", Tolerance);
   local fateDetails = srFindImage("fortune/fate_card_details.png", Tolerance);
-
   local confirm = srFindImage("fortune/confirm.png", Tolerance);
+
   if confirm then
     srClickMouse(confirm[0], confirm[1])
     sleepWithStatus(500,"Found/Clicked Confirm button to Clear screen", nil, 0.7);
@@ -54,12 +55,14 @@ end
 
   if fateCard then -- Found Generic/Brown card, so change it
     srClickMouse(fateCard[0], fateCard[1])
-    sleepWithStatus(500,"Found/Clicked Generic/Brown Fate Card", nil, 0.7);
+    if moreFeedback then
+      sleepWithStatus(500,"Found/Clicked Generic/Brown Fate Card", nil, 0.7);
+    end
 
     changeFateCards();
 
     if rollDice() then
-      sleepWithStatus(diceDelay,"Rolling Dice", nil, 0.7);
+      sleepWithStatus(diceDelay,"Rolling Dice; Waiting on Movement ...", nil, 0.7);
       -- Check if rewards window is open and close it
       checkRewardsConfirmButton();
     else
@@ -68,10 +71,12 @@ end
 
 
   elseif fateCard2 or (fateCard3 and doSeven) or fateCard4 then -- Found an existing desirable card; keep it!
-    sleepWithStatus(500,"Found existing desirable card", nil, 0.7);
+    if moreFeedback then
+      sleepWithStatus(500,"Desirable card ALREADY LOADED", nil, 0.7);
+    end
 
     if rollDice() then
-      sleepWithStatus(diceDelay,"Rolling Dice", nil, 0.7);
+      sleepWithStatus(diceDelay,"Rolling Dice; Waiting on Movement ...", nil, 0.7);
       -- Check if rewards window is open and close it
       checkRewardsConfirmButton();
     else
@@ -80,13 +85,15 @@ end
 
 
   elseif fateDetails then
-    sleepWithStatus(500,"Undesirable card seems loaded, CHANGE IT!", nil, 0.7);
+    if moreFeedback then
+      sleepWithStatus(500,"Undesirable card seems loaded, CHANGE IT!", nil, 0.7);
+    end
     srClickMouse(fateDetails[0]+100, fateDetails[1]-50)
 
     changeFateCards();
 
     if rollDice() then
-      sleepWithStatus(diceDelay,"Rolling Dice", nil, 0.7);
+      sleepWithStatus(diceDelay,"Rolling Dice; Waiting on Movement ...", nil, 0.7);
       -- Check if rewards window is open and close it
       checkRewardsConfirmButton();
     else
@@ -95,7 +102,7 @@ end
 
 
   else
-     sleepWithStatus(1500,"Did not find the Brown/Generic Fate card or desirable fate card!\n\nNothing to Do ...", nil, 0.7);
+     sleepWithStatus(1500,"Did not find the Brown/Generic Fate card or desirable fate card !\n\nNothing to Do ...", nil, 0.7);
   end -- if fateCard
 
 end
@@ -134,7 +141,7 @@ function changeFateCards()
         local seven = srFindImage("fortune/777.png", Tolerance);
 
         if majorHaul or onHouse or (doSeven and seven) then
-          sleepWithStatus(500,"Found Desirable Card!", nil, 0.7);
+          sleepWithStatus(500,"Found Desirable Card; KEEP !", nil, 0.7);
           ESCKey();
           break;
         end
@@ -149,7 +156,7 @@ function ESCKey()
   lsSleep(100);
   srKeyUp(VK_ESCAPE);
   --lsSleep(100);
-  sleepWithStatus(200,"Escape Key used", nil, 0.7);
+  sleepWithStatus(100,"Escape Key used", nil, 0.7);
 end
 
 
