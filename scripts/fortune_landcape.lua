@@ -141,7 +141,7 @@ function changeFateCards()
         local seven = srFindImage("fortune/777.png", Tolerance);
 
         if majorHaul or onHouse or (doSeven and seven) then
-          sleepWithStatus(500,"Found Desirable Card; KEEP !", nil, 0.7);
+          sleepWithStatus(500,"Found Desirable Card; KEEP IT !", nil, 0.7);
           ESCKey();
           break;
         end
@@ -156,7 +156,7 @@ function ESCKey()
   lsSleep(100);
   srKeyUp(VK_ESCAPE);
   --lsSleep(100);
-  sleepWithStatus(100,"Escape Key used", nil, 0.7);
+  sleepWithStatus(100,"Escape Key (Close Windows)", nil, 0.7);
 end
 
 
