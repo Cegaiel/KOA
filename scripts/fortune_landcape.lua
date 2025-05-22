@@ -132,7 +132,7 @@ end
 
 function changeFateCards()
     while 1 do
-      sleepWithStatus(500,"Searching for desirable cards.", nil, 0.7);
+      sleepWithStatus(500,"Searching for desirable cards", nil, 0.7);
 
       if changeCard() then
         srReadScreen();
