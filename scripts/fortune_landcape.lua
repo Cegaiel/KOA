@@ -113,7 +113,7 @@ function changeCard()
   local changeCard = srFindImage("fortune/change_card.png", Tolerance);
   if changeCard then
     srClickMouse(changeCard[0], changeCard[1])
-    sleepWithStatus(500,"Clicked Change Card", nil, 0.7);
+    sleepWithStatus(150,"Clicked Change Card", nil, 0.7);
     return true;
    end
   return false;
