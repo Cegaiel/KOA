@@ -4,7 +4,7 @@ waitTime = 1500; -- wait time for things that do not have a SKIP checkbox
 
 function doit()
 
-	askForWindow("Spam click the Draws x10 button on Dragon and Frozen Chests or Collectors Chest (plane keys) event when you have lots of keys.\n\nDragon Chest Event: Check the 'Skip' checkbox to go faster!\n\nMouse over Blue Stacks window and press Shift key to continue.");  
+	askForWindow("Spam click the Draws x1 or x10 button on Dragon and Frozen Chests or Collectors Chest (plane keys) event when you have lots of keys.\n\nDragon Chest Event: Check the 'Skip' checkbox to go faster!\n\nMouse over Blue Stacks window and press Shift key to continue.");  
 	
   checkWindowSize();
 

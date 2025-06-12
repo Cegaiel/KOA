@@ -50,13 +50,13 @@ end
 
   if confirm then
     srClickMouse(confirm[0], confirm[1])
-    sleepWithStatus(500,"Found/Clicked Confirm button to Clear screen", nil, 0.7);
+    sleepWithStatus(250,"Found/Clicked Confirm button to Clear screen", nil, 0.7);
   end
 
   if fateCard then -- Found Generic/Brown card, so change it
     srClickMouse(fateCard[0], fateCard[1])
     if moreFeedback then
-      sleepWithStatus(500,"Found/Clicked Generic/Brown Fate Card", nil, 0.7);
+      sleepWithStatus(250,"Found/Clicked Generic/Brown Fate Card", nil, 0.7);
     end
 
     changeFateCards();
@@ -72,7 +72,7 @@ end
 
   elseif fateCard2 or (fateCard3 and doSeven) or fateCard4 then -- Found an existing desirable card; keep it!
     if moreFeedback then
-      sleepWithStatus(500,"Desirable card ALREADY LOADED", nil, 0.7);
+      sleepWithStatus(250,"Desirable card ALREADY LOADED", nil, 0.7);
     end
 
     if rollDice() then
@@ -86,7 +86,7 @@ end
 
   elseif fateDetails then
     if moreFeedback then
-      sleepWithStatus(500,"Undesirable card seems loaded, CHANGE IT!", nil, 0.7);
+      sleepWithStatus(250,"Undesirable card seems loaded, CHANGE IT!", nil, 0.7);
     end
     srClickMouse(fateDetails[0]+100, fateDetails[1]-50)
 
@@ -113,7 +113,7 @@ function changeCard()
   local changeCard = srFindImage("fortune/change_card.png", Tolerance);
   if changeCard then
     srClickMouse(changeCard[0], changeCard[1])
-    sleepWithStatus(150,"Clicked Change Card", nil, 0.7);
+    sleepWithStatus(500,"Clicked 'Change Cards' button", nil, 0.7);
     return true;
    end
   return false;
@@ -132,7 +132,7 @@ end
 
 function changeFateCards()
     while 1 do
-      sleepWithStatus(500,"Searching for desirable cards", nil, 0.7);
+      sleepWithStatus(250,"Searching for desirable cards", nil, 0.7);
 
       if changeCard() then
         srReadScreen();
@@ -141,7 +141,7 @@ function changeFateCards()
         local seven = srFindImage("fortune/777.png", Tolerance);
 
         if majorHaul or onHouse or (doSeven and seven) then
-          sleepWithStatus(500,"Found Desirable Card; KEEP IT !", nil, 0.7);
+          sleepWithStatus(250,"Found Desirable Card; KEEP IT !", nil, 0.7);
           ESCKey();
           break;
         end
@@ -167,7 +167,7 @@ function checkRewardsConfirmButton()
 
   if confirm then
     srClickMouse(confirm[0], confirm[1])
-    sleepWithStatus(500,"Found/Clicked Confirm button to Clear screen", nil, 0.7);
+    sleepWithStatus(250,"Found/Clicked Confirm button to Clear screen", nil, 0.7);
 
     -- Check if Rewards window is still open behind the recently close Confirm button
     srReadScreen();

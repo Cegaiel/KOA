@@ -45,7 +45,7 @@ returnMarchReSend = 4; -- which march # (that's returned) before we start resend
 
 -- Define your characters/farms
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-dropdown_who_values = {"Ceg A", "Ceg B", "Ceg C"};
+dropdown_who_values = {"Ceg A", "Ceg B", "Ceg C", "Cegaiel"};
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -175,7 +175,7 @@ function askResources()
 
     if (dropdown_who_cur_value == 1) then
       dropdown_qty = {600000, 120000, 30000}; -- Food/Wood, Iron, Silver - 50% from Dinadin
-      marchslots = 5;
+      marchslots = 6;
       tradepct = 10.0; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
       secondsSend = 28; -- How many seconds appears on Trade window
       secondsReturn = 23; -- Seconds that appears on March when march is returning home
@@ -185,7 +185,7 @@ function askResources()
 
     elseif (dropdown_who_cur_value == 2) then
       dropdown_qty = {600000, 120000, 30000}; -- Food/Wood, Iron, Silver - 50% from Dinadin
-      marchslots = 5;
+      marchslots = 6;
       tradepct = 10.0; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
       secondsSend = 28; -- How many seconds appears on Trade window
       secondsReturn = 23; -- Seconds that appears on March when march is returning home
@@ -195,10 +195,21 @@ function askResources()
 
     elseif (dropdown_who_cur_value == 3) then
       dropdown_qty = {600000, 120000, 30000}; -- Food/Wood, Iron, Silver - 50% from Dinadin
-      marchslots = 5;
+      marchslots = 6;
       tradepct = 10.0; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
       secondsSend = 28; -- How many seconds appears on Trade window
       secondsReturn = 34; -- Seconds that appears on March when march is returning home
+
+--Cegaiel
+
+    elseif (dropdown_who_cur_value == 4) then
+      dropdown_qty = {750000, 150000, 37500}; -- Food/Wood, Iron, Silver - 50% from Dinadin
+      marchslots = 6;
+      tradepct = 5.5; -- See Trade Fee on the ACTUAL trade window! Don't use value in Trading Post -> Info window
+      secondsSend = 28; -- How many seconds appears on Trade window
+      secondsReturn = 34; -- Seconds that appears on March when march is returning home
+
+
 
 ------------------------------------------------------------------
 
