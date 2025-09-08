@@ -3,7 +3,7 @@ dofile("constants.inc");
 
 Tolerance = 5000;
 postDelay = 750;
-preDelay = 150;
+preDelay = 250;
 
 
 function doit()

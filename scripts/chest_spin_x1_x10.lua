@@ -1,10 +1,11 @@
 dofile("common.inc");
 waitTime = 1500; -- wait time for things that do not have a SKIP checkbox
-
+waitTerminate = 0;
+waitTerminateMax = 3;
 
 function doit()
 
-	askForWindow("Spam click the Draws x1 or x10 button on Dragon and Frozen Chests or Collectors Chest (plane keys) event when you have lots of keys.\n\nDragon Chest Event: Check the 'Skip' checkbox to go faster!\n\nMouse over Blue Stacks window and press Shift key to continue.");  
+	askForWindow("Spam click the Draws x1 or x10 button Frozen Chests or Collectors Chest (plane keys) or 20 for Dragon Chest event when you have lots of keys.\n\nDragon Chest Event: Check the 'Skip' checkbox to go faster!\n\nMouse over Blue Stacks window and press Shift key to continue.");  
 	
   checkWindowSize();
 
@@ -29,8 +30,16 @@ function doit()
 	end
 
 	if not key and not frozen and not planes then
-          sleepWithStatus(2000, "Could not anything to click, giving up", nil, 0.7)
-          break;
+	  waitTerminate = waitTerminate + 1;
+          sleepWithStatus(2000, "Could not anything to click, rechecking " .. waitTerminate .. "/" .. waitTerminateMax .. " times", nil, 0.7)
+
+          if waitTerminate == 5 then
+            sleepWithStatus(2000, "Giving Up, Bye!", nil, 0.7)
+            break;
+          end
+
+	else
+	  waitTerminate = 0;
         end
   end
 end

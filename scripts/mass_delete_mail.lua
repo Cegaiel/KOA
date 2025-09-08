@@ -1,7 +1,7 @@
 dofile("common.inc");
 
 waitTime = 2000; -- How many ms (1000 = 1 second) to wait for an image to appear before giving up
-remaining = 5; -- How many more times to delete after the 99+ mail indicator is no longer found
+remaining = 10; -- How many more times to delete after the 99+ mail indicator is no longer found
 --ignore99 = 1;
 
 function doit()
