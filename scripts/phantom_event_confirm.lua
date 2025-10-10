@@ -37,7 +37,7 @@ function doit()
       srSetMousePos(curLoc[0],curLoc[1]);
     end
 
-  sleepWithStatus(100, "Looking for buttons")
+  sleepWithStatus(100, "Looking for buttons ...")
 
   end
 
