@@ -8,7 +8,9 @@ abort = 0;
 
 function doit()
 
+  num_upgrades = promptNumber("Num times to Upgrade?", 1);
   askForWindow("Troop Upgrade\n\nSelect the troop you are upgrading so that the GREEN Upgrade button is showing BEFORE you begin!\n\nMouse over Blue Stacks window and press Shift key to continue.");  
+
   checkWindowSize();
 
   if waitForImage("training/upgrade_button.png", waitTime, "Verifying Green Upgrade button showing") then
@@ -31,10 +33,7 @@ function doit()
       local gold_plus = srFindImage("training/gold_plus.png");
       if gold_plus then
         srClickMouse(gold_plus[0]-52,gold_plus[1]+10);
-        --srClickMouse(gold_plus[0]-60,gold_plus[1]+10);
-        lsSleep(100);
-        srClickMouse(gold_plus[0]-52,gold_plus[1]+10);
-       sleepWithStatus(100, "Clicking Max on Slider Bar", nil, 0.7)
+        sleepWithStatus(200, "Clicking Max on Slider Bar", nil, 0.7)
       end
     end
 
@@ -76,8 +75,13 @@ lsSleep(500);
       local blue_claim = srFindImage("training/claim_blue.png");
       if blue_claim then
         srClickMouse(blue_claim[0],blue_claim[1]);
-        sleepWithStatus(100, "Clicking Blue: Claim All button", nil, 0.7)
+        sleepWithStatus(250, "Clicking Blue: Claim All button", nil, 0.7)
         checkedGray = 0;
+        num_upgrades = num_upgrades - 1;
+	if num_upgrades <= 0 then
+          sleepWithStatus(2500,"num Times to Upgrade has been met, aborting!");
+          abort = 1;
+        end
       end
     end
 
@@ -112,7 +116,12 @@ function checkClaimGreen()
       local green_claim = srFindImage("training/claim_green.png");
       if green_claim then
         srClickMouse(green_claim[0],green_claim[1]);
-        sleepWithStatus(100, "Clicking Green: Claim All button", nil, 0.7)
+        sleepWithStatus(250, "Clicking Green: Claim All button", nil, 0.7)
+        num_upgrades = num_upgrades - 1;
+	if num_upgrades <= 0 then
+          sleepWithStatus(2500,"num Times to Upgrade has been met, aborting!");
+          abort = 1;
+        end
       end
 
       --Hit Esc key
