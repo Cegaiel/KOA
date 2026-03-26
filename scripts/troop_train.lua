@@ -1,8 +1,8 @@
 dofile("common.inc");
 dofile("constants.inc");
 
-waitTime = 200; -- How many ms (1000 = 1 second) to wait for an image to appear before giving up
-defaultSleep = 1250; -- How many ms for most sleep
+waitTime = 1250; -- How many ms (1000 = 1 second) to wait for an image to appear before giving up
+defaultSleep = 1500; -- How many ms for most sleep
 tolerance = 6000; -- Image tolerance to find it -- Default is 4500 when no tolerance is specified
 checkedGray = 0;
 abort = 0;
@@ -62,6 +62,16 @@ function doit()
       end
     end
 
+    -- Sometimes a popup "The Time exceeded 00:xx:xx will be wasted after using Auto Speedup. Confirm to use?"
+    if waitForImage("training/confirm_yes.png", waitTime, "Checking for Confirm Speedup is Wasted", nil, tolerance) then
+      local confirm_yes = srFindImage("training/confirm_yes.png");
+      if confirm_yes then
+        srClickMouse(confirm_yes[0],confirm_yes[1]);
+        sleepWithStatus(defaultSleep, "Clicking Confirm Yes button", nil, 0.7, "Loops remaining: " .. num_train)
+      end
+    end
+
+
     checkClaimGreen();
 
     if waitForImage("training/blue_speedup.png", waitTime, "Checking for Blue Speedup", nil, tolerance) then
@@ -72,18 +82,11 @@ function doit()
       end
     end
 
-    -- Sometimes a popup "The Time exceeded 00:xx:xx will be wasted after using Auto Speedup. Confirm to use?"
-    if waitForImage("training/confirm_yes.png", waitTime, "Checking for Confirm Speedup is Wasted", nil, tolerance) then
-      local confirm_yes = srFindImage("training/confirm_yes.png");
-      if confirm_yes then
-        srClickMouse(confirm_yes[0],confirm_yes[1]);
-        sleepWithStatus(defaultSleep, "Clicking Confirm Yes button", nil, 0.7, "Loops remaining: " .. num_train)
-      end
-    end
   end -- while
 end
 
 function checkClaimGreen()
+    sleepWithStatus(defaultSleep, "Checking for Green Claim button", nil, 0.7, "Loops remaining: " .. num_train)
     if waitForImage("training/claim_green.png", waitTime, "Checking for Green: Claim All button", nil, tolerance) then
       local green_claim = srFindImage("training/claim_green.png");
       if green_claim then
@@ -99,8 +102,17 @@ function checkClaimGreen()
       end
     end
 
-	if abort == 0 and not green_claim then
-   	  checkGrayButtons();
+    -- Check for Blue Yes button. This will appear if training timer will have leftover values
+    if waitForImage("training/yes.png", waitTime, "Checking for Yes button", nil, tolerance) then
+      local blue_yes = srFindImage("training/yes.png");
+      if blue_yes then
+        srClickMouse(blue_yes[0],blue_yes[1]);
+        sleepWithStatus(defaultSleep, "Clicking Blue: Yes button", nil, 0.7, "Loops remaining: " .. num_train)
+      end
+    end
+
+	if abort == 0 and not green_claim and not blue_yes then
+   	  --checkGrayButtons();
 	end
 end
 
@@ -124,7 +136,7 @@ function checkGrayButtons()
       end
 
       if foundGray or checkedGray >= 4 then
-         sleepWithStatus(1000,"ISSUE: Found Gray Use All Button or we are stuck: Using ESC KEY\n\nCheckedGray Counter: " .. checkedGray);
+         sleepWithStatus(10000,"ISSUE: Found Gray Use All Button or we are stuck: Using ESC KEY\n\nCheckedGray Counter: " .. checkedGray);
 	  EscapeKey(); -- Hit Esc Key
       end
 

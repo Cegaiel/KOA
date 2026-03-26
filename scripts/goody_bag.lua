@@ -15,13 +15,13 @@ function doit()
 
   while 1 do
     look()
-    sleepWithStatus(150, "Looking for Goody Bag Distribute, Claim or Open buttons")
   end
 end
 
 
 function look()
   srReadScreen();
+  sleepWithStatus(150, "Looking for Goody Bag Distribute, Claim or Open buttons")
   local btnDistribute = srFindImage("distribute.png", Tolerance);
   local btnOpen = srFindImage("goody_bag_open.png", Tolerance);
   local curLoc = getMousePos();
@@ -31,7 +31,7 @@ function look()
 
   if btnDistribute then
     srClickMouse(btnDistribute[0],btnDistribute[1]);
-    sleepWithStatus(500, "Clicked Distribute Button...");
+    sleepWithStatus(250, "Clicked Distribute Button...");
     srReadScreen();
     local btnBag = srFindImage("goody_bag_icon.png", Tolerance);
     if btnBag then
@@ -42,12 +42,12 @@ function look()
 
   elseif btnOpen then
     srClickMouse(btnOpen[0],btnOpen[1]);
-    sleepWithStatus(500, "Clicked Open Button...")
+    sleepWithStatus(250, "Clicked Open Button...")
     srSetMousePos(curLoc[0], curLoc[1]);
 
   elseif claim then
     srClickMouse(claim[0],claim[1]);
-    sleepWithStatus(500, "Clicked Claim Button...")
+    sleepWithStatus(250, "Clicked Claim Button...")
     srSetMousePos(curLoc[0], curLoc[1]);
 
   elseif closeWindow then

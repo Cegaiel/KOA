@@ -118,6 +118,15 @@ end
 function changeCard()
   srReadScreen();
   local changeCard = srFindImage("fortune/change_card.png", Tolerance);
+  local confirmStart = srFindImage("fortune/confirmSTART.png", Tolerance);
+
+  if confirmStart then 
+    srClickMouse(confirmStart[0], confirmStart[1])
+    sleepWithStatus(500,"Clicked 'Confirm' button"..elapsed(), nil, 0.7);
+    srReadScreen();
+    local changeCard = srFindImage("fortune/change_card.png", Tolerance);
+  end
+
   if changeCard then
     srClickMouse(changeCard[0], changeCard[1])
     sleepWithStatus(500,"Clicked 'Change Cards' button"..elapsed(), nil, 0.7);
